@@ -26,6 +26,8 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ResultSetConsumer;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Model;
@@ -46,10 +48,15 @@ import org.vivoweb.webapp.createandlink.ResourceModel;
 import org.vivoweb.webapp.createandlink.crossref.CrossrefCreateAndLinkResourceProvider;
 import org.vivoweb.webapp.createandlink.pubmed.PubMedCreateAndLinkResourceProvider;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -73,8 +80,12 @@ import static edu.cornell.mannlib.vitro.webapp.auth.requestedAction.RequestedAct
  */
 @WebServlet(name = "CreateAndLinkResource", urlPatterns = {"/createAndLink/*"} )
 public class CreateAndLinkResourceController extends FreemarkerHttpServlet {
-    // Must be able to edit your own account to claim publications
+    private static final String NOT_MINE = "notmine";
+	private static final String EDITOR = "editor";
+	private static final String AUTHOR = "author";
+	// Must be able to edit your own account to claim publications
     public static final AuthorizationRequest REQUIRED_ACTIONS = SimplePermission.EDIT_OWN_ACCOUNT.ACTION;
+	private Log log = LogFactory.getLog(this.getClass());
 
     // Mappings for publication type to ontology types / classes
     private static final Map<String, String> typeToClassMap = new HashMap<>();
@@ -87,6 +98,8 @@ public class CreateAndLinkResourceController extends FreemarkerHttpServlet {
     /**
      * URIs of types and predicates in the VIVO ontology that we need for creating resources
      */
+    public static final String VITRO_MOST_SPECIFIC_TYPE = "http://vitro.mannlib.cornell.edu/ns/vitro/0.7#mostSpecificType";
+    public static final String FOAF_PERSON = "http://xmlns.com/foaf/0.1/Person";
     public static final String BIBO_ABSTRACT = "http://purl.org/ontology/bibo/abstract";
     public static final String BIBO_ARTICLE = "http://purl.org/ontology/bibo/Article";
     public static final String BIBO_BOOK = "http://purl.org/ontology/bibo/Book";
@@ -127,6 +140,7 @@ public class CreateAndLinkResourceController extends FreemarkerHttpServlet {
     public static final String VIVO_RANK = "http://vivoweb.org/ontology/core#rank";
     public static final String VIVO_RELATEDBY = "http://vivoweb.org/ontology/core#relatedBy";
     public static final String VIVO_RELATES = "http://vivoweb.org/ontology/core#relates";
+    public static final String VIVO_REJECTED_DOI = "http://vivoweb.org/ontology/core#rejectedDoi";
 
     public static final String VCARD_FAMILYNAME = "http://www.w3.org/2006/vcard/ns#familyName";
     public static final String VCARD_GIVENNAME = "http://www.w3.org/2006/vcard/ns#givenName";
@@ -213,7 +227,31 @@ public class CreateAndLinkResourceController extends FreemarkerHttpServlet {
     protected AuthorizationRequest requiredActions(VitroRequest vreq) {
         return REQUIRED_ACTIONS;
     }
+    
+    /**
+     * Override the entry point for the servlet in order to handle JSON responses.
+     * If we aren't outputting suggestions as JSON, then delegate to the super method.
+     *
+     * @param request
+     * @param response
+     * @throws IOException
+     * @throws ServletException
+     */
+    @Override
+    public void doGet(HttpServletRequest request, HttpServletResponse response)
+        throws IOException, ServletException {
 
+        if (!StringUtils.isEmpty(request.getParameter("suggestionsForUri"))) {
+            response.setContentType("application/json");
+            ObjectMapper objectMapper = new ObjectMapper();
+            objectMapper.writeValue(response.getWriter(), SuggestionsForUri.getSuggestedWorks(
+                    new VitroRequest(request), request.getParameter("suggestionsForUri")
+            ));
+        } else {
+            super.doGet(request, response);
+        }
+    }
+   
     /**
      * Main method for the resource claiming (create and link) workflow
      *
@@ -228,25 +266,27 @@ public class CreateAndLinkResourceController extends FreemarkerHttpServlet {
         CreateAndLinkResourceProvider provider = null;
 
         // First part of URL path after /createAndLink/ is used to identify the resource type (DOI, PubMed ID, etc)
-        String externalProvider = null;
+        String actionName = null;
         int typePos = requestURI.indexOf("/createAndLink/") + 15;
         if (typePos < requestURI.length()) {
             if (requestURI.indexOf('/', typePos) > typePos) {
-                externalProvider = requestURI.substring(typePos, requestURI.indexOf('/', typePos) - 1);
+                actionName = requestURI.substring(typePos, requestURI.indexOf('/', typePos) - 1);
             } else {
-                externalProvider = requestURI.substring(typePos);
+                actionName = requestURI.substring(typePos);
             }
 
             // Normalize the resource type key, and get the appropriate provider
-            externalProvider = externalProvider.trim().toLowerCase();
-            if (providers.containsKey(externalProvider)) {
-                provider = providers.get(externalProvider);
+            actionName = actionName.trim().toLowerCase();
+            if (providers.containsKey(actionName)) {
+                provider = providers.get(actionName);
             }
         }
 
         // If no provider was found (invalid path), return an error to the user
         if (provider == null) {
-            return new TemplateResponseValues("unknownResourceType.ftl");
+        	if (!"claim".equalsIgnoreCase(actionName)) {
+        		return new TemplateResponseValues("unknownResourceType.ftl");	
+        	}
         }
 
         // Obtain the DAO for getting an individual (that represents a person profile)
@@ -284,32 +324,38 @@ public class CreateAndLinkResourceController extends FreemarkerHttpServlet {
             }
         }
 
+
         // If we still haven't got a person, return an error to the user
-        if (person == null) {
+        if (person == null && !hasBackendEditing(vreq)) {
             return new TemplateResponseValues("unknownProfile.ftl");
         }
 
         // If the profile isn't associated with the logged in user
-        if (!isProfileUriForLoggedIn) {
-            // Check that we have back end editing priveleges
-            if (!PolicyHelper.isAuthorizedForActions(vreq, SimplePermission.DO_BACK_END_EDITING.ACTION)) {
-                // If all else fails, can we add statements to this individual?
-                AddDataPropertyStatement adps = new AddDataPropertyStatement(vreq.getJenaOntModel(), profileUri, SOME_URI, SOME_LITERAL);
-                AddObjectPropertyStatement aops = new AddObjectPropertyStatement(vreq.getJenaOntModel(), profileUri, SOME_PREDICATE, SOME_URI);
-                if (!PolicyHelper.isAuthorizedForActions(vreq, adps.or(aops))) {
-                    return new TemplateResponseValues("unauthorizedForProfile.ftl");
-                }
-            }
-        }
+		if (!isProfileUriForLoggedIn && !hasBackendEditing(vreq)) {
+			// Check that we have back end editing priveleges
+			// If all else fails, can we add statements to this individual?
+			AddDataPropertyStatement adps = new AddDataPropertyStatement(vreq.getJenaOntModel(), profileUri, SOME_URI, SOME_LITERAL);
+			AddObjectPropertyStatement aops = new AddObjectPropertyStatement(vreq.getJenaOntModel(), profileUri, SOME_PREDICATE, SOME_URI);
+			if (!PolicyHelper.isAuthorizedForActions(vreq, adps.or(aops))) {
+				return new TemplateResponseValues("unauthorizedForProfile.ftl");
+			}
+		}
 
             // Create a map of common values to pass to the templates
         Map<String, Object> templateValues = new HashMap<>();
         templateValues.put("link", profileUri);
-        templateValues.put("label", provider.getLabel());
-        templateValues.put("provider", externalProvider);
+        if (provider != null) {
+        	templateValues.put("label", provider.getLabel());
+        }
+        templateValues.put("provider", actionName);
         templateValues.put("profileUri", profileUri);
-        templateValues.put("personLabel",    person.getRdfsLabel());
-        templateValues.put("personThumbUrl", person.getThumbUrl());
+        if (person != null) {
+        	templateValues.put("personLabel",    person.getRdfsLabel());
+        	templateValues.put("personThumbUrl", person.getThumbUrl());
+        }
+        templateValues.put("hasBackendEditing", hasBackendEditing(vreq));
+        templateValues.put("linkAuthors", getLinkAuthors(vreq));
+        
 
         // Get the requested action (e.g. find, confirm)
         String action = vreq.getParameter("action");
@@ -333,53 +379,21 @@ public class CreateAndLinkResourceController extends FreemarkerHttpServlet {
                 // Loop through each external ID that was on the page
                 for (String externalId : externalIds) {
                     // Get the normalized ID from the resource provider
-                    externalId = provider.normalize(externalId);
-
+                	if (provider != null) {
+                		externalId = provider.normalize(externalId);
+                	}
                     // Ensure that we have an ID
                     if (!StringUtils.isEmpty(externalId)) {
-                        // Check that the user is claiming a relationship to the resource
-                        if (!"notmine".equalsIgnoreCase(vreq.getParameter("contributor" + externalId))) {
-                            // If we are processing a resource that is already in VIVO, get the Vivo URI from the form
-                            String vivoUri = vreq.getParameter("vivoUri" + externalId);
-
-                            // If we don't already know that the resource has been created in VIVO
-                            if (StringUtils.isEmpty(vivoUri)) {
-                                // Check that it hasn't been created since when we first rendered the page
-                                ExternalIdentifiers allExternalIds = provider.allExternalIDsForFind(externalId);
-                                vivoUri = findInVIVO(vreq, allExternalIds, profileUri, null);
-                            }
-
-                            // If we haven't got an existing VIVO resource by this point, create it
-                            if (StringUtils.isEmpty(vivoUri)) {
-                                ResourceModel resourceModel = null;
-
-                                // Get the publication type from the form
-                                String typeUri = vreq.getParameter("type" + externalId);
-
-                                // Get the appropriate resource provider for the external ID from the form
-                                String resourceProvider = vreq.getParameter("externalProvider" + externalId);
-
-                                // Get an intermediate ResourceModel from the provider
-                                if (providers.containsKey(resourceProvider)) {
-                                    resourceModel = providers.get(resourceProvider).makeResourceModel(externalId, vreq.getParameter("externalResource" + externalId));
-                                } else {
-                                    resourceModel = provider.makeResourceModel(externalId, vreq.getParameter("externalResource" + externalId));
-                                }
-
-                                // If we have an intermediate model, create the VIVO representation from the model
-                                if (resourceModel != null) {
-                                    vivoUri = createVIVOObject(vreq, updatedModel, resourceModel, typeUri);
-                                }
-                            } else {
-                                // Get the existing statements for the model, and add them to the both in-memory models
-                                Model existingResourceModel = getExistingResource(vreq, vivoUri);
-                                existingModel.add(existingResourceModel);
-                                updatedModel.add(existingResourceModel);
-                            }
-
+                    	if (NOT_MINE.equalsIgnoreCase(getClaimType(vreq, externalId))) {
+                    		createNotRelatesRelationship(vreq, updatedModel, profileUri, externalId);
+                    	} else {
+                        	// If we are processing a resource that is already in VIVO, get the Vivo URI from the form
+                            String vivoUri = getVivoUri(vreq, externalId, provider, profileUri, updatedModel, existingModel);
                             // Process the user's chosen relationship with the resource, updating the updated model
-                            processRelationships(vreq, updatedModel, vivoUri, profileUri, vreq.getParameter("contributor" + externalId));
-                        }
+                            if (getLinkAuthors(vreq)) {
+                            	processRelationships(vreq, updatedModel, vivoUri, profileUri, externalId);
+                            }
+                    	}
                     }
                 }
 
@@ -400,116 +414,488 @@ public class CreateAndLinkResourceController extends FreemarkerHttpServlet {
             externalIdsToFind = vreq.getParameter("externalIds");
         }
 
-        // If we have external IDs to find (either directly from the entry form, or unprocessed from a long list)
-        if (!StringUtils.isEmpty(externalIdsToFind)) {
-            Set<String> uniqueIds = new HashSet<>();
-            Set<String> remainderIds = new HashSet<>();
-            List<Citation> citations = new ArrayList<>();
+        Set<String> uniqueIds = new HashSet<>();
+        Set<String> remainderIds = new HashSet<>();
+        List<Citation> citations = new ArrayList<>();
 
-            // Split the passed IDs into a parseable array (separated by whitespace, oe comma)
-            String[] externalIdArr = externalIdsToFind.split("[\\s,]+");
-
-            // Go through each identifier
-            for (String externalId : externalIdArr) {
-                // Normalize the identifier, and create a set of unique identifiers (remove duplicates)
-                externalId = provider.normalize(externalId);
-                if (!StringUtils.isEmpty(externalId) && !uniqueIds.contains(externalId)) {
-                    uniqueIds.add(externalId);
-                }
+        // If we are claiming existing records within VIVO
+        if ("claim".equalsIgnoreCase(actionName)) {
+            String[] suggestedUris;
+            // If we are in a mutli-page process, then the remaining URIs will be in externalIdsToFind.
+            if (!StringUtils.isEmpty(externalIdsToFind)) {
+                suggestedUris = externalIdsToFind.split("[\\s,]+");
+            } else {
+                // First page of the claiming process, so generate the list of suggested works
+                suggestedUris = SuggestionsForUri.getSuggestedWorks(vreq, profileUri);
             }
 
             int idCount = 0;
-            // Loop through all the unique identifiers
-            for (String externalId : uniqueIds) {
-                // If we've already processed 5 or more identifiers
+            for (String suggestedUri : suggestedUris) {
                 if (idCount > 4) {
                     // Add the identifier to the remainder list to be processed on the next page
-                    remainderIds.add(externalId);
+                    remainderIds.add(suggestedUri);
                 } else {
-                    // Prepare a citation object for this identifier
                     Citation citation = new Citation();
-                    citation.externalId = externalId;
 
-                    // First, resolve all known identifiers for the identifier processed
-                    ExternalIdentifiers allExternalIds = provider.allExternalIDsForFind(externalId);
+                    populateCitationFromVIVO(vreq, citation, suggestedUri, profileUri);
 
-                    // Try to find an existing resource that has one of the known external identifiers
-                    // Note, this will populate the citation object if it exists
-                    citation.vivoUri = findInVIVO(vreq, allExternalIds, profileUri, citation);
+                    citation.externalId = "" + idCount;
+                    citation.vivoUri = suggestedUri;
 
-                    // If we did not find a resource in VIVO
-                    if (StringUtils.isEmpty(citation.vivoUri)) {
-                        // If we have a DOI for the resource, first attempt to find the metadata via DOI
-                        if (!StringUtils.isEmpty(allExternalIds.DOI)) {
-                            CreateAndLinkResourceProvider doiProvider = providers.get("doi");
-                            if (doiProvider != null) {
-                                // Attempt to find the DOI in via the doi resource provider (fills the citation object)
-                                citation.externalResource = doiProvider.findInExternal(allExternalIds.DOI, citation);
-
-                                // If we were successful, record that the record was looked up via DOI
-                                if (!StringUtils.isEmpty(citation.externalResource)) {
-                                    citation.externalProvider = "doi";
-                                }
-                            }
-                        }
-
-                        // Did not resolve the resource via DOI, so look in the provider for the original identifier
-                        if (StringUtils.isEmpty(citation.externalResource)) {
-                            // Only if the original identifier was not a DOI
-                            if (!"doi".equalsIgnoreCase(externalProvider)) {
-                                citation.externalResource = provider.findInExternal(externalId, citation);
-                                citation.externalProvider = externalProvider;
-                            }
+                    for (Map.Entry<String, String> typeEntry : typeToClassMap.entrySet()) {
+                        if (typeEntry.getValue().equals(citation.typeUri)) {
+                            citation.type = typeEntry.getKey();
                         }
                     }
-
+                    citation.typeUri = typeToClassMap.getOrDefault(citation.type, BIBO_ARTICLE);
                     // Guess which author in the available metadata is the user claiming the work
                     proposeAuthorToLink(vreq, citation, profileUri);
 
-                    // Conver the type in the citation to a VIVO type uri for use in the confirmation form
-                    citation.typeUri = typeToClassMap.getOrDefault(citation.type, BIBO_ARTICLE);
+                    citations.add(citation);
 
-                    // If we have found a citation, add it to the list of citations to display
-                    if (citation.vivoUri != null || citation.externalResource != null) {
-                        citations.add(citation);
-
-                        // Increment the count of processed identifiers
-                        idCount++;
-                    } else {
-                        citation.showError = true;
-                        citations.add(citation);
-                    }
+                    // Increment the count of processed identifiers
+                    idCount++;
                 }
             }
-
-            // If we have found records to claim
-            if (citations.size() > 0) {
-                // Add the citations to the values to pass to the template
-                templateValues.put("citations", citations);
-
-                // Add the list of known publication types
-                templateValues.put("publicationTypes", getPublicationTypes(vreq));
-
-                // If there are IDs still left to process, add them to the values passed to the template
-                if (remainderIds.size() > 0) {
-                    templateValues.put("remainderIds", StringUtils.join(remainderIds, "\n"));
-                    templateValues.put("remainderCount", remainderIds.size());
-                }
-
-                // Show the confirmation page for the processed identifiers
-                return new TemplateResponseValues("createAndLinkResourceConfirm.ftl", templateValues);
-            } else {
-                // Nothing to show, so go back to the form, passing an indicator that nothing was found
-                templateValues.put("notfound", true);
+        } else {
+        // If we have external IDs to find (either directly from the entry form, or unprocessed from a long list)
+	        if (!StringUtils.isEmpty(externalIdsToFind)) {
+	
+	            // Split the passed IDs into a parseable array (separated by whitespace, oe comma)
+	            String[] externalIdArr = externalIdsToFind.split("[\\s,]+");
+	
+	            // Go through each identifier
+	            for (String externalId : externalIdArr) {
+	                // Normalize the identifier, and create a set of unique identifiers (remove duplicates)
+	                externalId = provider.normalize(externalId);
+	                if (!StringUtils.isEmpty(externalId) && !uniqueIds.contains(externalId)) {
+	                    uniqueIds.add(externalId);
+	                }
+	            }
+	
+	            int idCount = 0;
+	            // Loop through all the unique identifiers
+	            for (String externalId : uniqueIds) {
+	                // If we've already processed 5 or more identifiers
+	                if (idCount > 4) {
+	                    // Add the identifier to the remainder list to be processed on the next page
+	                    remainderIds.add(externalId);
+	                } else {
+	                    // Prepare a citation object for this identifier
+	                    Citation citation = new Citation();
+	                    citation.externalId = externalId;
+	
+	                    // First, resolve all known identifiers for the identifier processed
+	                    ExternalIdentifiers allExternalIds = provider.allExternalIDsForFind(externalId);
+	
+	                    // Try to find an existing resource that has one of the known external identifiers
+	                    // Note, this will populate the citation object if it exists
+	                    citation.vivoUri = findInVIVO(vreq, allExternalIds, profileUri, citation);
+	
+	                    // If we did not find a resource in VIVO
+	                    if (StringUtils.isEmpty(citation.vivoUri)) {
+	                        // If we have a DOI for the resource, first attempt to find the metadata via DOI
+	                        if (!StringUtils.isEmpty(allExternalIds.DOI)) {
+	                            CreateAndLinkResourceProvider doiProvider = providers.get("doi");
+	                            if (doiProvider != null) {
+	                                // Attempt to find the DOI in via the doi resource provider (fills the citation object)
+	                                citation.externalResource = doiProvider.findInExternal(allExternalIds.DOI, citation);
+	
+	                                // If we were successful, record that the record was looked up via DOI
+	                                if (!StringUtils.isEmpty(citation.externalResource)) {
+	                                    citation.externalProvider = "doi";
+	                                }
+	                            }
+	                        }
+	
+	                        // Did not resolve the resource via DOI, so look in the provider for the original identifier
+	                        if (StringUtils.isEmpty(citation.externalResource)) {
+	                            // Only if the original identifier was not a DOI
+	                            if (!"doi".equalsIgnoreCase(actionName)) {
+	                                citation.externalResource = provider.findInExternal(externalId, citation);
+	                                citation.externalProvider = actionName;
+	                            }
+	                        }
+	                    }
+	
+	                    // Guess which author in the available metadata is the user claiming the work
+	                    proposeAuthorToLink(vreq, citation, profileUri);
+	
+	                    // Conver the type in the citation to a VIVO type uri for use in the confirmation form
+	                    citation.typeUri = typeToClassMap.getOrDefault(citation.type, BIBO_ARTICLE);
+	
+	                    // If we have found a citation, add it to the list of citations to display
+	                    if (citation.vivoUri != null || citation.externalResource != null) {
+	                        citations.add(citation);
+	
+	                        // Increment the count of processed identifiers
+	                        idCount++;
+	                    } else {
+	                        citation.showError = true;
+	                        citations.add(citation);
+	                    }
+	                }
+	            }
+	
+	            
+	        } else {
+                // Show the entry form for a user to enter a set of identifiers
                 return new TemplateResponseValues("createAndLinkResourceEnterID.ftl", templateValues);
             }
-        }
-
         // Show the entry form for a user to enter a set of identifiers
-        return new TemplateResponseValues("createAndLinkResourceEnterID.ftl", templateValues);
-    }
+        }
+        // If we have found records to claim
+        if (citations.size() > 0) {
+            // Add the citations to the values to pass to the template
+            templateValues.put("citations", citations);
 
-    private String getFormattedProfileName(VitroRequest vreq, String profileUri) {
+            // Add the list of known publication types
+            templateValues.put("publicationTypes", getPublicationTypes(vreq));
+
+            // If there are IDs still left to process, add them to the values passed to the template
+            if (remainderIds.size() > 0) {
+                templateValues.put("remainderIds", StringUtils.join(remainderIds, "\n"));
+                templateValues.put("remainderCount", remainderIds.size());
+            }
+
+            // Show the confirmation page for the processed identifiers
+            return new TemplateResponseValues("createAndLinkResourceConfirm.ftl", templateValues);
+        } else {
+            // Nothing to show, so go back to the form, passing an indicator that nothing was found
+            templateValues.put("notfound", true);
+            return new TemplateResponseValues("createAndLinkResourceEnterID.ftl", templateValues);
+        }
+    }
+    
+    
+    protected void populateCitationFromVIVO(VitroRequest vreq, Citation citation, String vivoUri, String profileUri) {
+        // If we have been passed a citation object, and have found a resource, populate the citation object
+        if (citation != null && !StringUtils.isEmpty(vivoUri)) {
+            // Get a moel for the resource
+            Model model = getExistingResource(vreq, vivoUri);
+
+            // Get the resource from the model
+            Resource work = model.getResource(vivoUri);
+            String pageStart = null;
+            String pageEnd = null;
+            Citation.Name[] rankedAuthors = null;
+            ArrayList<Citation.Name> unrankedAuthors = new ArrayList<>();
+
+            // Loop through all the statements on the resource
+            StmtIterator stmtIterator = work.listProperties();
+            try {
+                while (stmtIterator.hasNext()) {
+                    Statement stmt = stmtIterator.next();
+
+                    switch (stmt.getPredicate().getURI()) {
+                        case RDFS_LABEL:
+                            citation.title = stmt.getString();
+                            break;
+
+                        case BIBO_VOLUME:
+                            citation.volume = stmt.getString();
+                            break;
+
+                        case BIBO_ISSUE:
+                            citation.issue = stmt.getString();
+                            break;
+
+                        case BIBO_PAGE_START:
+                            pageStart = stmt.getString();
+                            break;
+
+                        case BIBO_PAGE_END:
+                            pageEnd = stmt.getString();
+                            break;
+
+                        // Publication date
+                        case VIVO_DATETIMEVALUE:
+                            Resource dateTime = stmt.getResource();
+                            if (dateTime != null) {
+                                Statement stmtDate = dateTime.getProperty(model.getProperty(VIVO_DATETIME));
+                                if (stmtDate != null) {
+                                    String dateTimeValue = stmtDate.getString();
+                                    if (dateTimeValue != null && dateTimeValue.length() > 3) {
+                                        citation.publicationYear = Integer.parseInt(dateTimeValue.substring(0, 4), 10);
+                                    }
+                                }
+                            }
+                            break;
+
+                        // Journal
+                        case VIVO_HASPUBLICATIONVENUE:
+                            Resource journal = stmt.getResource();
+                            if (journal != null) {
+                                Statement stmtJournalName = journal.getProperty(RDFS.label);
+                                if (stmtJournalName != null) {
+                                    citation.journal = stmtJournalName.getString();
+                                }
+                            }
+                            break;
+
+                        // Relationships - we are really interested in authors and editors
+                        case VIVO_RELATEDBY:
+                            // Get the relationship context
+                            Resource relationship = stmt.getResource();
+                            if (relationship != null) {
+                                Integer rank = null;
+
+                                // If it isn't an authorship or editorship, skip it
+                                if (!isResourceOfType(relationship, VIVO_AUTHORSHIP) &&
+                                    !isResourceOfType(relationship, VIVO_EDITORSHIP)) {
+                                    break;
+                                }
+
+                                // Now loop over the properties of the author/editorship context
+                                Resource personResource = null;
+                                StmtIterator relationshipIter = relationship.listProperties();
+                                try {
+                                    while (relationshipIter.hasNext()) {
+                                        Statement relationshipStmt = relationshipIter.next();
+                                        switch (relationshipStmt.getPredicate().getURI()) {
+                                            // If it is a relates property
+                                            case VIVO_RELATES:
+                                                // If it isn't pointing to the resource, it must be pointing to a person
+                                                if (!vivoUri.equals(relationshipStmt.getResource().getURI())) {
+                                                    if (personResource == null && relationshipStmt.getResource().hasProperty(RDF.type, model.createResource(VCARD_INDIVIDUAL))) {
+                                                        personResource = relationshipStmt.getResource();
+                                                    } else if (relationshipStmt.getResource().hasProperty(RDF.type, model.createResource(FOAF_PERSON))) {
+                                                        personResource = relationshipStmt.getResource();
+                                                    }
+                                                }
+                                                break;
+
+                                            // Author position
+                                            case VIVO_RANK:
+                                                rank = relationshipStmt.getInt();
+                                                break;
+                                        }
+                                    }
+                                } finally {
+                                    relationshipIter.close();
+                                }
+
+                                Citation.Name newAuthor = null;
+
+                                // If we've got an author
+                                if (personResource != null) {
+                                    // If the author is the user, then they have already claimed this publication
+                                    if (profileUri != null && profileUri.equals(personResource.getURI())) {
+                                        citation.alreadyClaimed = true;
+                                    }
+
+                                    if (isResourceOfType(relationship, VIVO_AUTHORSHIP)) {
+                                        boolean linked = false;
+
+                                        // Now get the name of the author, from either the VCARD or the foaf:Person
+                                        Statement familyName = null;
+                                        Statement givenName = null;
+                                        if (isResourceOfType(personResource, VCARD_INDIVIDUAL)) {
+                                            if (personResource.hasProperty(model.getProperty(VCARD_HAS_NAME))) {
+                                                Resource vcardName = personResource.getPropertyResourceValue(model.getProperty(VCARD_HAS_NAME));
+                                                if (vcardName != null) {
+                                                    if (vcardName.hasProperty(model.getProperty(VCARD_GIVENNAME))) {
+                                                        givenName = vcardName.getProperty(model.getProperty(VCARD_GIVENNAME));
+                                                    }
+                                                    if (vcardName.hasProperty(model.getProperty(VCARD_FAMILYNAME))) {
+                                                        familyName = vcardName.getProperty(model.getProperty(VCARD_FAMILYNAME));
+                                                    }
+                                                }
+                                            }
+                                        } else if (personResource.hasProperty(model.getProperty(OBO_HAS_CONTACT_INFO))) {
+                                            Resource vCard = personResource.getPropertyResourceValue(model.getProperty(OBO_HAS_CONTACT_INFO));
+                                            if (vCard.hasProperty(model.getProperty(VCARD_HAS_NAME))) {
+                                                Resource vcardName = vCard.getPropertyResourceValue(model.getProperty(VCARD_HAS_NAME));
+                                                if (vcardName != null) {
+                                                    if (vcardName.hasProperty(model.getProperty(VCARD_GIVENNAME))) {
+                                                        givenName = vcardName.getProperty(model.getProperty(VCARD_GIVENNAME));
+                                                    }
+                                                    if (vcardName.hasProperty(model.getProperty(VCARD_FAMILYNAME))) {
+                                                        familyName = vcardName.getProperty(model.getProperty(VCARD_FAMILYNAME));
+                                                    }
+                                                }
+                                                linked = true;
+                                            }
+                                        }
+
+                                        if (givenName == null) {
+                                            // It's a foaf person, which means it is already linked to a full profile in VIVO
+                                            if (personResource.hasProperty(model.getProperty(FOAF_FIRSTNAME))) {
+                                                givenName = personResource.getProperty(model.getProperty(FOAF_FIRSTNAME));
+                                            }
+                                            if (personResource.hasProperty(model.getProperty(FOAF_LASTNAME))) {
+                                                familyName = personResource.getProperty(model.getProperty(FOAF_LASTNAME));
+                                            }
+                                            linked = true;
+                                        }
+
+                                        // If we have an author name, format it
+                                        if (familyName != null) {
+                                            newAuthor = new Citation.Name();
+                                            if (givenName != null) {
+                                                newAuthor.name = CreateAndLinkUtils.formatAuthorString(familyName.getString(), givenName.getString());
+                                            } else {
+                                                newAuthor.name = CreateAndLinkUtils.formatAuthorString(familyName.getString(), null);
+                                            }
+
+                                            // Record whether the author is a full profile, or just a VCARD
+                                            newAuthor.linked = linked;
+                                        } else {
+                                            Statement label = personResource.getProperty(RDFS.label);
+                                            if (label != null) {
+                                                String name = label.getString();
+                                                if (name.contains(",")) {
+                                                    String[] parts = name.split("\\s*,\\s*");
+                                                    if (parts.length > 1) {
+                                                        name = CreateAndLinkUtils.formatAuthorString(parts[0], parts[parts.length - 1]);
+                                                    }
+                                                } else {
+                                                    String[] parts = name.split("\\s*");
+                                                    if (parts.length > 1) {
+                                                        name = CreateAndLinkUtils.formatAuthorString(parts[parts.length - 1], parts[0]);
+                                                    }
+                                                }
+
+                                                newAuthor = new Citation.Name();
+                                                newAuthor.name = name;
+                                                newAuthor.linked = linked;
+                                            }
+                                        }
+                                    }
+                                } else {
+                                    if (isResourceOfType(relationship, VIVO_AUTHORSHIP)) {
+                                        newAuthor = new Citation.Name();
+                                        newAuthor.name = "Deleted Author";
+                                    }
+                                }
+
+                                // If we have an author
+                                if (newAuthor != null) {
+                                    // If we have an author position, insert it in the correct place of the ranked authors
+                                    if (rank != null) {
+                                        if (rankedAuthors == null) {
+                                            rankedAuthors = new Citation.Name[rank];
+                                        } else if (rankedAuthors.length < rank) {
+                                            Citation.Name[] newAuthors = new Citation.Name[rank];
+                                            for (int i = 0; i < rankedAuthors.length; i++) {
+                                                newAuthors[i] = rankedAuthors[i];
+                                            }
+                                            rankedAuthors = newAuthors;
+                                        }
+                                        rankedAuthors[rank - 1] = newAuthor;
+                                    } else {
+                                        // Unranked author, so just keep hold of it to add at the end
+                                        unrankedAuthors.add(newAuthor);
+                                    }
+                                }
+                            }
+                            break;
+
+                        case VITRO_MOST_SPECIFIC_TYPE:
+                            // Get the most specific type of an existing record, so that we can display it
+                            // as part of the claiming process
+                            if (stmt.getObject().isResource()) {
+                                String typeUri = stmt.getObject().asResource().getURI();
+                                if (typeToClassMap.containsValue(typeUri)) {
+                                    citation.typeUri = typeUri;
+                                }
+                            }
+                            break;
+                    }
+                }
+            } finally {
+                stmtIterator.close();
+            }
+
+            // Create the pagination field
+            if (!StringUtils.isEmpty(pageStart)) {
+                if (!StringUtils.isEmpty(pageEnd)) {
+                    citation.pagination = pageStart + "-" + pageEnd;
+                } else {
+                    citation.pagination = pageStart;
+                }
+            }
+
+            // If we have unranked authors, add them to the end of the ranked authors
+            if (unrankedAuthors.size() > 0) {
+                if (rankedAuthors == null) {
+                    citation.authors = unrankedAuthors.toArray(new Citation.Name[unrankedAuthors.size()]);
+                } else {
+                    Citation.Name[] newAuthors = new Citation.Name[rankedAuthors.length + unrankedAuthors.size()];
+                    int i = 0;
+                    while (i < rankedAuthors.length) {
+                        newAuthors[i] = rankedAuthors[i];
+                        i++;
+                    }
+                    while (i < newAuthors.length && unrankedAuthors.size() > 0) {
+                        newAuthors[i] = unrankedAuthors.remove(0);
+                        i++;
+                    }
+                    citation.authors = newAuthors;
+                }
+            } else {
+                citation.authors = rankedAuthors;
+            }
+        }
+    }
+    
+
+	private String getClaimType(VitroRequest vreq, String externalId) {
+		return vreq.getParameter("contributor" + externalId);
+	}
+
+	private String getVivoUri(VitroRequest vreq, String externalId, CreateAndLinkResourceProvider provider, String profileUri, Model updatedModel, Model existingModel) {
+		String vivoUri = vreq.getParameter("vivoUri" + externalId);
+		// If we don't already know that the resource has been created in VIVO
+        if (StringUtils.isEmpty(vivoUri)) {
+            // Check that it hasn't been created since when we first rendered the page
+            ExternalIdentifiers allExternalIds = provider.allExternalIDsForFind(externalId);
+            vivoUri = findInVIVO(vreq, allExternalIds, profileUri, null);
+        }
+        
+        // If we haven't got an existing VIVO resource by this point, create it
+        if (StringUtils.isEmpty(vivoUri)) {
+            ResourceModel resourceModel = null;
+
+            // Get the publication type from the form
+            String typeUri = vreq.getParameter("type" + externalId);
+
+            // Get the appropriate resource provider for the external ID from the form
+            String resourceProvider = vreq.getParameter("externalProvider" + externalId);
+
+            // Get an intermediate ResourceModel from the provider
+            if (providers.containsKey(resourceProvider)) {
+                resourceModel = providers.get(resourceProvider).makeResourceModel(externalId, vreq.getParameter("externalResource" + externalId));
+            } else {
+                resourceModel = provider.makeResourceModel(externalId, vreq.getParameter("externalResource" + externalId));
+            }
+
+            // If we have an intermediate model, create the VIVO representation from the model
+            if (resourceModel != null) {
+                vivoUri = createVIVOObject(vreq, updatedModel, resourceModel, typeUri);
+            }
+        } else {
+            // Get the existing statements for the model, and add them to the both in-memory models
+            Model existingResourceModel = getExistingResource(vreq, vivoUri);
+            existingModel.add(existingResourceModel);
+            updatedModel.add(existingResourceModel);
+        }
+ 
+		return vivoUri;
+	}
+	
+	private boolean hasBackendEditing(VitroRequest vreq) {
+		return PolicyHelper.isAuthorizedForActions(vreq, SimplePermission.DO_BACK_END_EDITING.ACTION);
+	}
+
+	private boolean getLinkAuthors(VitroRequest vreq) {
+		if ("false".equalsIgnoreCase(vreq.getParameter("linkAuthors"))) {
+			return false;
+		}
+		return true;
+	}
+	
+	static String getFormattedProfileName(VitroRequest vreq, String profileUri) {
         final Citation.Name name = new Citation.Name();
 
         name.name = null;
@@ -525,25 +911,7 @@ public class CreateAndLinkResourceController extends FreemarkerHttpServlet {
 
         try {
             // Process the query
-            vreq.getRDFService().sparqlSelectQuery(vcardQuery, new ResultSetConsumer() {
-                @Override
-                protected void processQuerySolution(QuerySolution qs) {
-                    // Get the name(s) from the result set
-                    Literal familyName = qs.contains("familyName") ? qs.getLiteral("familyName") : null;
-                    Literal givenName  = qs.contains("givenName") ? qs.getLiteral("givenName") : null;
-
-                    if (StringUtils.isEmpty(name.name)) {
-                        // If we have a first / last name, create a formatted author string
-                        if (familyName != null) {
-                            if (givenName != null) {
-                                name.name = CreateAndLinkUtils.formatAuthorString(familyName.getString(), givenName.getString());
-                            } else {
-                                name.name = CreateAndLinkUtils.formatAuthorString(familyName.getString(), null);
-                            }
-                        }
-                    }
-                }
-            });
+            vreq.getRDFService().sparqlSelectQuery(vcardQuery, new NameResultSetConsumer(name));
         } catch (RDFServiceException e) {
             e.printStackTrace();
         }
@@ -558,25 +926,7 @@ public class CreateAndLinkResourceController extends FreemarkerHttpServlet {
         if (StringUtils.isEmpty(name.name)) {
             try {
                 // Process the query
-                vreq.getRDFService().sparqlSelectQuery(foafQuery, new ResultSetConsumer() {
-                    @Override
-                    protected void processQuerySolution(QuerySolution qs) {
-                        // Get the name(s) from the result set
-                        Literal familyName = qs.contains("familyName") ? qs.getLiteral("familyName") : null;
-                        Literal givenName  = qs.contains("givenName") ? qs.getLiteral("givenName") : null;
-
-                        if (StringUtils.isEmpty(name.name)) {
-                            // If we have a first / last name, create a formatted author string
-                            if (familyName != null) {
-                                if (givenName != null) {
-                                    name.name = CreateAndLinkUtils.formatAuthorString(familyName.getString(), givenName.getString());
-                                } else {
-                                    name.name = CreateAndLinkUtils.formatAuthorString(familyName.getString(), null);
-                                }
-                            }
-                        }
-                    }
-                });
+                vreq.getRDFService().sparqlSelectQuery(foafQuery, new NameResultSetConsumer(name));
             } catch (RDFServiceException e) {
                 e.printStackTrace();
             }
@@ -665,6 +1015,7 @@ public class CreateAndLinkResourceController extends FreemarkerHttpServlet {
             }
         }
     }
+    
 
     /**
      * Find an existing resource in VIVO, and return a Model with the appropriate statements
@@ -739,6 +1090,7 @@ public class CreateAndLinkResourceController extends FreemarkerHttpServlet {
 
             vreq.getRDFService().sparqlConstructQuery(query, model);
         } catch (RDFServiceException e) {
+        	log.error(e, e);
         }
 
         return model;
@@ -750,53 +1102,67 @@ public class CreateAndLinkResourceController extends FreemarkerHttpServlet {
      * @param vreq
      * @param model
      * @param vivoUri
-     * @param userUri
+     * @param profileUri
      * @param relationship
      */
-    protected void processRelationships(VitroRequest vreq, Model model, String vivoUri, String userUri, String relationship) {
-        if (relationship != null) {
+    protected void processRelationships(VitroRequest vreq, Model model, String vivoUri, String profileUri, String externalId) {
+    	String claim = getClaimType(vreq, externalId);
+        if (claim != null) {
             // If authorship is being claimed
-            if (relationship.startsWith("author")) {
-                // Create an authorship context object
-                Resource authorship = model.createResource(getUnusedUri(vreq));
-                authorship.addProperty(RDF.type, model.getResource(VIVO_AUTHORSHIP));
-
-                // Add the resource and the user as relates predicates of the context
-                authorship.addProperty(model.createProperty(VIVO_RELATES), model.getResource(vivoUri));
-                authorship.addProperty(model.createProperty(VIVO_RELATES), model.getResource(userUri));
-
-                // Add related by predicates to the user and resource, linking to the context
-                model.getResource(vivoUri).addProperty(model.createProperty(VIVO_RELATEDBY), authorship);
-                model.getResource(userUri).addProperty(model.createProperty(VIVO_RELATEDBY), authorship);
-
-                // If the relationship contains an author position
-                if (relationship.length() > 6) {
-                    // Parse out the author position to a numeric rank
-                    String posStr = relationship.substring(6);
-                    int rank = Integer.parseInt(posStr, 10);
-                    // Remove an existing authorship at that rank
-                    removeAuthorship(vreq, model, vivoUri, rank);
-                    try {
-                        // Add the chosen rank to the authorship context created
-                        authorship.addLiteral(model.createProperty(VIVO_RANK), rank);
-                    } catch (NumberFormatException nfe) {
-                    }
-                }
-            } else if (relationship.startsWith("editor")) {
-                // User is claiming editorship
-                Resource editorship = model.createResource(getUnusedUri(vreq));
-                editorship.addProperty(RDF.type, model.getResource(VIVO_EDITORSHIP));
-
-                // Add the resource and the user as relates predicates of the context
-                editorship.addProperty(model.createProperty(VIVO_RELATES), model.getResource(vivoUri));
-                editorship.addProperty(model.createProperty(VIVO_RELATES), model.getResource(userUri));
-
-                // Add related by predicates to the user and resource, linking to the context
-                model.getResource(vivoUri).addProperty(model.createProperty(VIVO_RELATEDBY), editorship);
-                model.getResource(userUri).addProperty(model.createProperty(VIVO_RELATEDBY), editorship);
-            }
+            if (claim.startsWith(AUTHOR)) {
+                createAuthorRelationship(vreq, model, vivoUri, profileUri, claim);
+            } else if (claim.startsWith(EDITOR)) {
+                createEditorRealationship(vreq, model, vivoUri, profileUri);
+            } 
         }
     }
+    
+	private void createNotRelatesRelationship(VitroRequest vreq, Model model, String userUri, String externalId) {
+		model.add(model.getResource(userUri), model.getProperty(VIVO_REJECTED_DOI), externalId);
+	}
+
+	private void createAuthorRelationship(VitroRequest vreq, Model model, String vivoUri, String userUri, String relationship) {
+		// Create an authorship context object
+		Resource authorship = model.createResource(getUnusedUri(vreq));
+		authorship.addProperty(RDF.type, model.getResource(VIVO_AUTHORSHIP));
+
+		// Add the resource and the user as relates predicates of the context
+		authorship.addProperty(model.createProperty(VIVO_RELATES), model.getResource(vivoUri));
+		authorship.addProperty(model.createProperty(VIVO_RELATES), model.getResource(userUri));
+
+		// Add related by predicates to the user and resource, linking to the context
+		model.getResource(vivoUri).addProperty(model.createProperty(VIVO_RELATEDBY), authorship);
+		model.getResource(userUri).addProperty(model.createProperty(VIVO_RELATEDBY), authorship);
+
+		// If the relationship contains an author position
+		if (relationship.length() > AUTHOR.length()) {
+		    // Parse out the author position to a numeric rank
+		    String posStr = relationship.substring(AUTHOR.length());
+		    try {
+		    	int rank = Integer.parseInt(posStr, 10);
+			    // Remove an existing authorship at that rank
+			    removeAuthorship(vreq, model, vivoUri, rank);
+		        // Add the chosen rank to the authorship context created
+		        authorship.addLiteral(model.createProperty(VIVO_RANK), rank);
+		    } catch (NumberFormatException nfe) {
+		    	log.error(nfe, nfe);
+		    }
+		}
+	}
+
+	private void createEditorRealationship(VitroRequest vreq, Model model, String vivoUri, String userUri) {
+		// User is claiming editorship
+		Resource editorship = model.createResource(getUnusedUri(vreq));
+		editorship.addProperty(RDF.type, model.getResource(VIVO_EDITORSHIP));
+
+		// Add the resource and the user as relates predicates of the context
+		editorship.addProperty(model.createProperty(VIVO_RELATES), model.getResource(vivoUri));
+		editorship.addProperty(model.createProperty(VIVO_RELATES), model.getResource(userUri));
+
+		// Add related by predicates to the user and resource, linking to the context
+		model.getResource(vivoUri).addProperty(model.createProperty(VIVO_RELATEDBY), editorship);
+		model.getResource(userUri).addProperty(model.createProperty(VIVO_RELATEDBY), editorship);
+	}
 
     /**
      * Removes an existing authorship at a given position, when that position is claimed by the author
@@ -1239,6 +1605,7 @@ public class CreateAndLinkResourceController extends FreemarkerHttpServlet {
         try {
             return uriMaker.getUnusedNewURI(null);
         } catch (InsertException e) {
+        	log.error(e, e);
         }
 
         return null;
@@ -1624,7 +1991,7 @@ public class CreateAndLinkResourceController extends FreemarkerHttpServlet {
                                 // If we've got an author
                                 if (personResource != null) {
                                     // If the author is the user, then they have already claimed this publication
-                                    if (profileUri.equals(personResource.getURI())) {
+                                    if (profileUri.equals(personResource.getURI()) && !getLinkAuthors(vreq)) {
                                         citation.alreadyClaimed = true;
                                     }
 
