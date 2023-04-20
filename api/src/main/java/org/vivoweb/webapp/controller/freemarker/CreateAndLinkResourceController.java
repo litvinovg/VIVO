@@ -64,9 +64,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static edu.cornell.mannlib.vitro.webapp.auth.requestedAction.RequestedAction.SOME_LITERAL;
-import static edu.cornell.mannlib.vitro.webapp.auth.requestedAction.RequestedAction.SOME_PREDICATE;
-import static edu.cornell.mannlib.vitro.webapp.auth.requestedAction.RequestedAction.SOME_URI;
+import static edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ActionRequest.SOME_LITERAL;
+import static edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ActionRequest.SOME_PREDICATE;
+import static edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ActionRequest.SOME_URI;
 
 /**
  * Main controller class for claiming (creating and/or linking) resources to a profile
@@ -74,7 +74,7 @@ import static edu.cornell.mannlib.vitro.webapp.auth.requestedAction.RequestedAct
 @WebServlet(name = "CreateAndLinkResource", urlPatterns = {"/createAndLink/*"} )
 public class CreateAndLinkResourceController extends FreemarkerHttpServlet {
     // Must be able to edit your own account to claim publications
-    public static final AuthorizationRequest REQUIRED_ACTIONS = SimplePermission.EDIT_OWN_ACCOUNT.ACTION;
+    public static final AuthorizationRequest REQUIRED_ACTIONS = SimplePermission.EDIT_OWN_ACCOUNT.actionRequest;
 
     // Mappings for publication type to ontology types / classes
     private static final Map<String, String> typeToClassMap = new HashMap<>();
@@ -292,7 +292,7 @@ public class CreateAndLinkResourceController extends FreemarkerHttpServlet {
         // If the profile isn't associated with the logged in user
         if (!isProfileUriForLoggedIn) {
             // Check that we have back end editing priveleges
-            if (!PolicyHelper.isAuthorizedForActions(vreq, SimplePermission.DO_BACK_END_EDITING.ACTION)) {
+            if (!PolicyHelper.isAuthorizedForActions(vreq, SimplePermission.DO_BACK_END_EDITING.actionRequest)) {
                 // If all else fails, can we add statements to this individual?
                 AddDataPropertyStatement adps = new AddDataPropertyStatement(vreq.getJenaOntModel(), profileUri, SOME_URI, SOME_LITERAL);
                 AddObjectPropertyStatement aops = new AddObjectPropertyStatement(vreq.getJenaOntModel(), profileUri, SOME_PREDICATE, SOME_URI);
