@@ -19,7 +19,7 @@ import edu.cornell.mannlib.vitro.webapp.visualization.visutils.VisualizationRequ
 
 public class ToolsRequestHandler implements VisualizationRequestHandler {
 
-	public static final AuthorizationRequest REQUIRED_ACTIONS = SimplePermission.REFRESH_VISUALIZATION_CACHE.ACTION;
+	public static final AuthorizationRequest REQUIRED_ACTIONS = SimplePermission.REFRESH_VISUALIZATION_CACHE.actionRequest;
 
 	@Override
 	public Object generateAjaxVisualization(VitroRequest vitroRequest, Log log,

@@ -40,7 +40,7 @@ public class InstitutionalInternalClassController extends FreemarkerHttpServlet 
     private static final Log log = LogFactory.getLog(InstitutionalInternalClassController.class);
 
     private static final String EDIT_FORM = "/processInstitutionalInternalClass";
-    public final static AuthorizationRequest REQUIRED_ACTIONS = SimplePermission.MANAGE_MENUS.ACTION;
+    public final static AuthorizationRequest REQUIRED_ACTIONS = SimplePermission.MANAGE_MENUS.actionRequest;
     private static final String DISPLAY_FORM = "/institutionalInternalClassForm.ftl";
     private static HashMap<String, String> localNamespaces = new HashMap<String, String>();
     private static HashMap<String, String> localNamespaceClasses = new HashMap<String, String>();
