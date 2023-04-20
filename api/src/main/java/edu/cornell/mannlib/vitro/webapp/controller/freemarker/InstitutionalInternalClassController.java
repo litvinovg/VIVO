@@ -20,7 +20,7 @@ import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.shared.Lock;
 
-import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
+import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermissions;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
@@ -40,7 +40,7 @@ public class InstitutionalInternalClassController extends FreemarkerHttpServlet 
     private static final Log log = LogFactory.getLog(InstitutionalInternalClassController.class);
 
     private static final String EDIT_FORM = "/processInstitutionalInternalClass";
-    public final static AuthorizationRequest REQUIRED_ACTIONS = SimplePermission.MANAGE_MENUS.actionRequest;
+    public final static AuthorizationRequest REQUIRED_ACTIONS = SimplePermissions.MANAGE_MENUS.actionRequest;
     private static final String DISPLAY_FORM = "/institutionalInternalClassForm.ftl";
     private static HashMap<String, String> localNamespaces = new HashMap<String, String>();
     private static HashMap<String, String> localNamespaceClasses = new HashMap<String, String>();
