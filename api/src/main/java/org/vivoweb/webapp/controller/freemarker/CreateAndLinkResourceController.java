@@ -6,6 +6,7 @@ import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermissions;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthHelper;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AddDataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AddObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
@@ -296,7 +297,7 @@ public class CreateAndLinkResourceController extends FreemarkerHttpServlet {
                 // If all else fails, can we add statements to this individual?
                 AddDataPropertyStatement adps = new AddDataPropertyStatement(vreq.getJenaOntModel(), profileUri, SOME_URI, SOME_LITERAL);
                 AddObjectPropertyStatement aops = new AddObjectPropertyStatement(vreq.getJenaOntModel(), profileUri, SOME_PREDICATE, SOME_URI);
-                if (!PolicyHelper.isAuthorizedForActions(vreq, adps.or(aops))) {
+                if (!PolicyHelper.isAuthorizedForActions(vreq, AuthHelper.logicOr(adps, aops))) {
                     return new TemplateResponseValues("unauthorizedForProfile.ftl");
                 }
             }

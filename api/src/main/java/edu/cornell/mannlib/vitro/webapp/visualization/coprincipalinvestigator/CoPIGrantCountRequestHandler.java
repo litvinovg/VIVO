@@ -13,6 +13,7 @@ import org.apache.commons.logging.Log;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
 
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthHelper;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
@@ -288,7 +289,7 @@ public class CoPIGrantCountRequestHandler implements VisualizationRequestHandler
 
 	@Override
 	public AuthorizationRequest getRequiredPrivileges() {
-		return AuthorizationRequest.AUTHORIZED;
+		return AuthHelper.AUTHORIZED;
 	}
 
 }
