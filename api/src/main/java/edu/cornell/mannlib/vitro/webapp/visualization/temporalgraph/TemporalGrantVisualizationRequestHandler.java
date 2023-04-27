@@ -26,7 +26,7 @@ import org.apache.commons.logging.Log;
 
 import org.apache.jena.query.Dataset;
 
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ActionRequest;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AccessObject;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
@@ -307,7 +307,7 @@ public class TemporalGrantVisualizationRequestHandler implements
 	}
 
 	@Override
-	public ActionRequest getRequiredPrivileges() {
+	public AccessObject getRequiredPrivileges() {
 		return null;
 	}
 }

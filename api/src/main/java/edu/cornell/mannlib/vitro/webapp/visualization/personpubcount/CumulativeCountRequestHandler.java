@@ -2,7 +2,7 @@
 
 package edu.cornell.mannlib.vitro.webapp.visualization.personpubcount;
 
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ActionRequest;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AccessObject;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.visualization.exceptions.MalformedQueryParametersException;
@@ -23,7 +23,7 @@ import java.util.TreeMap;
 
 public class CumulativeCountRequestHandler implements VisualizationRequestHandler {
     @Override
-    public ActionRequest getRequiredPrivileges() {
+    public AccessObject getRequiredPrivileges() {
         return null;
     }
 

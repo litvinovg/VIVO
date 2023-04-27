@@ -5,7 +5,7 @@ package org.vivoweb.webapp.controller.freemarker;
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermissions;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ActionRequest;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AccessObject;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthHelper;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AddDataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AddObjectPropertyStatement;
@@ -65,9 +65,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ActionRequest.SOME_LITERAL;
-import static edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ActionRequest.SOME_PREDICATE;
-import static edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ActionRequest.SOME_URI;
+import static edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AccessObject.SOME_LITERAL;
+import static edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AccessObject.SOME_PREDICATE;
+import static edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AccessObject.SOME_URI;
 
 /**
  * Main controller class for claiming (creating and/or linking) resources to a profile
@@ -75,7 +75,7 @@ import static edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ActionReques
 @WebServlet(name = "CreateAndLinkResource", urlPatterns = {"/createAndLink/*"} )
 public class CreateAndLinkResourceController extends FreemarkerHttpServlet {
     // Must be able to edit your own account to claim publications
-    public static final ActionRequest REQUIRED_ACTIONS = SimplePermissions.EDIT_OWN_ACCOUNT.actionRequest;
+    public static final AccessObject REQUIRED_ACTIONS = SimplePermissions.EDIT_OWN_ACCOUNT.actionRequest;
 
     // Mappings for publication type to ontology types / classes
     private static final Map<String, String> typeToClassMap = new HashMap<>();
@@ -211,7 +211,7 @@ public class CreateAndLinkResourceController extends FreemarkerHttpServlet {
      * @return
      */
     @Override
-    protected ActionRequest requiredActions(VitroRequest vreq) {
+    protected AccessObject requiredActions(VitroRequest vreq) {
         return REQUIRED_ACTIONS;
     }
 
