@@ -18,7 +18,7 @@ import org.apache.commons.logging.LogFactory;
 import edu.cornell.mannlib.orcidclient.context.OrcidClientContext;
 import edu.cornell.mannlib.orcidclient.context.OrcidClientContext.Setting;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthHelper;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ActionRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.authenticate.LogoutRedirector;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet;
@@ -95,7 +95,7 @@ public class OrcidIntegrationController extends FreemarkerHttpServlet {
 	 * the user should not remain on this page after logging out.
 	 */
 	@Override
-	protected AuthorizationRequest requiredActions(VitroRequest vreq) {
+	protected ActionRequest requiredActions(VitroRequest vreq) {
 		LogoutRedirector.recordRestrictedPageUri(vreq);
 		return AuthHelper.AUTHORIZED;
 	}

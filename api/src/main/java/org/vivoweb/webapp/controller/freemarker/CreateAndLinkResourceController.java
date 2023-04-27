@@ -5,7 +5,7 @@ package org.vivoweb.webapp.controller.freemarker;
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermissions;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ActionRequest;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthHelper;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AddDataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AddObjectPropertyStatement;
@@ -75,7 +75,7 @@ import static edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ActionReques
 @WebServlet(name = "CreateAndLinkResource", urlPatterns = {"/createAndLink/*"} )
 public class CreateAndLinkResourceController extends FreemarkerHttpServlet {
     // Must be able to edit your own account to claim publications
-    public static final AuthorizationRequest REQUIRED_ACTIONS = SimplePermissions.EDIT_OWN_ACCOUNT.actionRequest;
+    public static final ActionRequest REQUIRED_ACTIONS = SimplePermissions.EDIT_OWN_ACCOUNT.actionRequest;
 
     // Mappings for publication type to ontology types / classes
     private static final Map<String, String> typeToClassMap = new HashMap<>();
@@ -211,7 +211,7 @@ public class CreateAndLinkResourceController extends FreemarkerHttpServlet {
      * @return
      */
     @Override
-    protected AuthorizationRequest requiredActions(VitroRequest vreq) {
+    protected ActionRequest requiredActions(VitroRequest vreq) {
         return REQUIRED_ACTIONS;
     }
 

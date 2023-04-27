@@ -23,7 +23,7 @@ import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.RDFNode;
 
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ActionRequest;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
@@ -501,7 +501,7 @@ public class UtilitiesRequestHandler implements VisualizationRequestHandler {
 	}
 
 	@Override
-	public AuthorizationRequest getRequiredPrivileges() {
+	public ActionRequest getRequiredPrivileges() {
 		// TODO Auto-generated method stub
 		return null;
 	}

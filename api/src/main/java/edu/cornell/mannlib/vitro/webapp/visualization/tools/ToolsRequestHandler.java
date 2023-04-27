@@ -10,7 +10,7 @@ import org.apache.commons.logging.Log;
 import org.apache.jena.query.Dataset;
 
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermissions;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ActionRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
@@ -19,7 +19,7 @@ import edu.cornell.mannlib.vitro.webapp.visualization.visutils.VisualizationRequ
 
 public class ToolsRequestHandler implements VisualizationRequestHandler {
 
-	public static final AuthorizationRequest REQUIRED_ACTIONS = SimplePermissions.REFRESH_VISUALIZATION_CACHE.actionRequest;
+	public static final ActionRequest REQUIRED_ACTIONS = SimplePermissions.REFRESH_VISUALIZATION_CACHE.actionRequest;
 
 	@Override
 	public Object generateAjaxVisualization(VitroRequest vitroRequest, Log log,
@@ -50,7 +50,7 @@ public class ToolsRequestHandler implements VisualizationRequestHandler {
 	}
 
 	@Override
-	public AuthorizationRequest getRequiredPrivileges() {
+	public ActionRequest getRequiredPrivileges() {
 		return REQUIRED_ACTIONS;
 	}
 

@@ -21,7 +21,7 @@ import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.shared.Lock;
 
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermissions;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ActionRequest;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.edit.utils.LocalNamespaceClassUtils;
@@ -40,14 +40,14 @@ public class InstitutionalInternalClassController extends FreemarkerHttpServlet 
     private static final Log log = LogFactory.getLog(InstitutionalInternalClassController.class);
 
     private static final String EDIT_FORM = "/processInstitutionalInternalClass";
-    public final static AuthorizationRequest REQUIRED_ACTIONS = SimplePermissions.MANAGE_MENUS.actionRequest;
+    public final static ActionRequest REQUIRED_ACTIONS = SimplePermissions.MANAGE_MENUS.actionRequest;
     private static final String DISPLAY_FORM = "/institutionalInternalClassForm.ftl";
     private static HashMap<String, String> localNamespaces = new HashMap<String, String>();
     private static HashMap<String, String> localNamespaceClasses = new HashMap<String, String>();
     private static final String CREATE_CLASS_PARAM = "createClass";
     private static final String REDIRECT_PAGE = "/siteAdmin";
     @Override
-    protected AuthorizationRequest requiredActions(VitroRequest vreq) {
+    protected ActionRequest requiredActions(VitroRequest vreq) {
     	return REQUIRED_ACTIONS;
     }
 

@@ -12,7 +12,7 @@ import org.apache.jena.query.Dataset;
 import org.apache.jena.query.Syntax;
 import org.apache.jena.rdf.model.Model;
 
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ActionRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
@@ -40,7 +40,7 @@ public class StandardVisualizationController extends FreemarkerHttpServlet {
     public static ServletContext servletContext;
 
     @Override
-    protected AuthorizationRequest requiredActions(VitroRequest vreq) {
+    protected ActionRequest requiredActions(VitroRequest vreq) {
     	/*
     	 * Based on the query parameters passed via URI get the appropriate visualization
     	 * request handler.
@@ -50,7 +50,7 @@ public class StandardVisualizationController extends FreemarkerHttpServlet {
 
     	if (visRequestHandler != null) {
 
-    		AuthorizationRequest requiredPrivileges = visRequestHandler.getRequiredPrivileges();
+    		ActionRequest requiredPrivileges = visRequestHandler.getRequiredPrivileges();
 			if (requiredPrivileges != null) {
     			return requiredPrivileges;
     		}

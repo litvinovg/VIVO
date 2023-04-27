@@ -15,7 +15,7 @@ import org.apache.jena.query.QuerySolution;
 import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ActionRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
@@ -38,7 +38,7 @@ import java.util.Set;
 
 public class CapabilityMapRequestHandler implements VisualizationRequestHandler {
     @Override
-    public AuthorizationRequest getRequiredPrivileges() {
+    public ActionRequest getRequiredPrivileges() {
         return null;
     }
 
