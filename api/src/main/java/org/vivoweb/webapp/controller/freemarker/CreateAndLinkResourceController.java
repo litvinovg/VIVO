@@ -9,8 +9,8 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AccessOperation;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthHelper;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.SimpleAuthorizationRequest;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AddDataPropertyStatement;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AddObjectPropertyStatement;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.DataPropertyStatementAccessObject;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.ObjectPropertyStatementAccessObject;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.SelfEditingConfiguration;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
@@ -297,8 +297,8 @@ public class CreateAndLinkResourceController extends FreemarkerHttpServlet {
             // Check that we have back end editing priveleges
             if (!PolicyHelper.isAuthorizedForActions(vreq, SimplePermission.DO_BACK_END_EDITING.ACTION)) {
                 // If all else fails, can we add statements to this individual?
-                AddDataPropertyStatement adps = new AddDataPropertyStatement(vreq.getJenaOntModel(), profileUri, SOME_URI, SOME_LITERAL);
-                AddObjectPropertyStatement aops = new AddObjectPropertyStatement(vreq.getJenaOntModel(), profileUri, SOME_PREDICATE, SOME_URI);
+                DataPropertyStatementAccessObject adps = new DataPropertyStatementAccessObject(vreq.getJenaOntModel(), profileUri, SOME_URI, SOME_LITERAL);
+                ObjectPropertyStatementAccessObject aops = new ObjectPropertyStatementAccessObject(vreq.getJenaOntModel(), profileUri, SOME_PREDICATE, SOME_URI);
                 if (!PolicyHelper.isAuthorizedForActions(vreq, 
                         AuthHelper.logicOr(
                                 new SimpleAuthorizationRequest(aops, AccessOperation.ADD), 
