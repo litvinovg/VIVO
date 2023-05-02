@@ -8,7 +8,7 @@ import org.apache.commons.logging.Log;
 
 import org.apache.jena.query.Dataset;
 
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AccessObject;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.visualization.exceptions.MalformedQueryParametersException;
@@ -25,7 +25,7 @@ import edu.cornell.mannlib.vitro.webapp.visualization.exceptions.MalformedQueryP
  */
 public interface VisualizationRequestHandler {
 
-	AccessObject getRequiredPrivileges();
+    AuthorizationRequest getRequiredPrivileges();
 
 	ResponseValues generateStandardVisualization(VitroRequest vitroRequest,
 							   Log log,

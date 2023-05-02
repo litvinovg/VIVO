@@ -6,7 +6,10 @@ import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AccessObject;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AccessOperation;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthHelper;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.SimpleAuthorizationRequest;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AddDataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AddObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
@@ -75,7 +78,7 @@ import static edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AccessObject
 @WebServlet(name = "CreateAndLinkResource", urlPatterns = {"/createAndLink/*"} )
 public class CreateAndLinkResourceController extends FreemarkerHttpServlet {
     // Must be able to edit your own account to claim publications
-    public static final AccessObject REQUIRED_ACTIONS = SimplePermission.EDIT_OWN_ACCOUNT.ACTION;
+    public static final AuthorizationRequest REQUIRED_ACTIONS = SimplePermission.EDIT_OWN_ACCOUNT.ACTION;
 
     // Mappings for publication type to ontology types / classes
     private static final Map<String, String> typeToClassMap = new HashMap<>();
@@ -211,7 +214,7 @@ public class CreateAndLinkResourceController extends FreemarkerHttpServlet {
      * @return
      */
     @Override
-    protected AccessObject requiredActions(VitroRequest vreq) {
+    protected AuthorizationRequest requiredActions(VitroRequest vreq) {
         return REQUIRED_ACTIONS;
     }
 
@@ -297,7 +300,11 @@ public class CreateAndLinkResourceController extends FreemarkerHttpServlet {
                 // If all else fails, can we add statements to this individual?
                 AddDataPropertyStatement adps = new AddDataPropertyStatement(vreq.getJenaOntModel(), profileUri, SOME_URI, SOME_LITERAL);
                 AddObjectPropertyStatement aops = new AddObjectPropertyStatement(vreq.getJenaOntModel(), profileUri, SOME_PREDICATE, SOME_URI);
-                if (!PolicyHelper.isAuthorizedForActions(vreq, AuthHelper.logicOr(adps, aops), null)) {
+                if (!PolicyHelper.isAuthorizedForActions(vreq, 
+                        AuthHelper.logicOr(
+                                new SimpleAuthorizationRequest(aops, AccessOperation.ADD), 
+                                new SimpleAuthorizationRequest(aops, AccessOperation.ADD))
+                        , null)) {
                     return new TemplateResponseValues("unauthorizedForProfile.ftl");
                 }
             }

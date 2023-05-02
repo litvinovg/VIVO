@@ -18,7 +18,7 @@ import org.apache.jena.query.Dataset;
 import org.apache.jena.query.Syntax;
 import org.apache.jena.rdf.model.Model;
 
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AccessObject;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.TemplateProcessingHelper.TemplateProcessingException;
@@ -46,7 +46,7 @@ public class AjaxVisualizationController extends FreemarkerHttpServlet {
     public static ServletContext servletContext;
 
     @Override
-    protected AccessObject requiredActions(VitroRequest vreq) {
+    protected AuthorizationRequest requiredActions(VitroRequest vreq) {
 
     	/*
     	 * Based on the query parameters passed via URI get the appropriate visualization
@@ -57,7 +57,7 @@ public class AjaxVisualizationController extends FreemarkerHttpServlet {
 
     	if (visRequestHandler != null) {
 
-    		AccessObject requiredPrivileges = visRequestHandler.getRequiredPrivileges();
+    	    AuthorizationRequest requiredPrivileges = visRequestHandler.getRequiredPrivileges();
 			if (requiredPrivileges != null) {
     			return requiredPrivileges;
     		}

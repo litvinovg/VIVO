@@ -27,6 +27,7 @@ import org.apache.commons.logging.Log;
 import org.apache.jena.query.Dataset;
 
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AccessObject;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
@@ -309,7 +310,7 @@ public class TemporalPublicationVisualizationRequestHandler implements
 	}
 
 	@Override
-	public AccessObject getRequiredPrivileges() {
+	public AuthorizationRequest getRequiredPrivileges() {
 		// TODO Auto-generated method stub
 		return null;
 	}
