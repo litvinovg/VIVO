@@ -5,7 +5,6 @@ package org.vivoweb.webapp.controller.freemarker;
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AccessObject;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AccessOperation;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthHelper;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest;
@@ -296,15 +295,14 @@ public class CreateAndLinkResourceController extends FreemarkerHttpServlet {
         // If the profile isn't associated with the logged in user
         if (!isProfileUriForLoggedIn) {
             // Check that we have back end editing priveleges
-            if (!PolicyHelper.isAuthorizedForActions(vreq, SimplePermission.DO_BACK_END_EDITING.ACTION, null)) {
+            if (!PolicyHelper.isAuthorizedForActions(vreq, SimplePermission.DO_BACK_END_EDITING.ACTION)) {
                 // If all else fails, can we add statements to this individual?
                 AddDataPropertyStatement adps = new AddDataPropertyStatement(vreq.getJenaOntModel(), profileUri, SOME_URI, SOME_LITERAL);
                 AddObjectPropertyStatement aops = new AddObjectPropertyStatement(vreq.getJenaOntModel(), profileUri, SOME_PREDICATE, SOME_URI);
                 if (!PolicyHelper.isAuthorizedForActions(vreq, 
                         AuthHelper.logicOr(
                                 new SimpleAuthorizationRequest(aops, AccessOperation.ADD), 
-                                new SimpleAuthorizationRequest(aops, AccessOperation.ADD))
-                        , null)) {
+                                new SimpleAuthorizationRequest(aops, AccessOperation.ADD)))) {
                     return new TemplateResponseValues("unauthorizedForProfile.ftl");
                 }
             }
