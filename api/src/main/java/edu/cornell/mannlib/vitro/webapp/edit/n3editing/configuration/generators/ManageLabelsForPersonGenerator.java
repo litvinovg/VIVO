@@ -339,7 +339,7 @@ public class ManageLabelsForPersonGenerator extends BaseEditConfigurationGenerat
 		AddObjectPropertyStatement aops = new AddObjectPropertyStatement(
 				vreq.getJenaOntModel(), individual.getURI(),
 				SOME_PREDICATE, SOME_URI);
-    	return PolicyHelper.isAuthorizedForActions(vreq, AuthHelper.logicOr(adps, aops));
+    	return PolicyHelper.isAuthorizedForActions(vreq, AuthHelper.logicOr(adps, aops), null);
 	}
 
 

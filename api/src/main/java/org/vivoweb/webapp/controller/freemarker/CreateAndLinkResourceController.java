@@ -293,11 +293,11 @@ public class CreateAndLinkResourceController extends FreemarkerHttpServlet {
         // If the profile isn't associated with the logged in user
         if (!isProfileUriForLoggedIn) {
             // Check that we have back end editing priveleges
-            if (!PolicyHelper.isAuthorizedForActions(vreq, SimplePermission.DO_BACK_END_EDITING.ACTION)) {
+            if (!PolicyHelper.isAuthorizedForActions(vreq, SimplePermission.DO_BACK_END_EDITING.ACTION, null)) {
                 // If all else fails, can we add statements to this individual?
                 AddDataPropertyStatement adps = new AddDataPropertyStatement(vreq.getJenaOntModel(), profileUri, SOME_URI, SOME_LITERAL);
                 AddObjectPropertyStatement aops = new AddObjectPropertyStatement(vreq.getJenaOntModel(), profileUri, SOME_PREDICATE, SOME_URI);
-                if (!PolicyHelper.isAuthorizedForActions(vreq, AuthHelper.logicOr(adps, aops))) {
+                if (!PolicyHelper.isAuthorizedForActions(vreq, AuthHelper.logicOr(adps, aops), null)) {
                     return new TemplateResponseValues("unauthorizedForProfile.ftl");
                 }
             }
