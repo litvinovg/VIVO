@@ -59,8 +59,6 @@ edu.cornell.mannlib.vitro.webapp.auth.policy.setup.CommonPolicyFamilySetup
 
 edu.cornell.mannlib.vitro.webapp.auth.RootUserSetup
 
-edu.cornell.mannlib.vivo.auth.policy.SelfEditorRelationship$Setup
-
 edu.cornell.mannlib.vitro.webapp.services.shortview.ShortViewServiceSetup
 
 edu.cornell.mannlib.vitro.webapp.visualization.setup.VisualizationSetup
