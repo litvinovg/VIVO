@@ -1,0 +1,17 @@
+<div class="grid-container">
+  <app-menu></app-menu>
+  <div class="content">
+    <mat-sidenav-container class="example-container">
+      <mat-accordion>
+        <mat-expansion-panel *ngFor="let faq of faqs">
+          <mat-expansion-panel-header>
+            <mat-panel-title>
+              {{ faq.question }}
+            </mat-panel-title>
+          </mat-expansion-panel-header>
+          <p>{{ faq.answer }}</p>
+        </mat-expansion-panel>
+      </mat-accordion>
+    </mat-sidenav-container>
+  </div>
+</div>

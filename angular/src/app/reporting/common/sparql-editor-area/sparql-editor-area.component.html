@@ -1,0 +1,17 @@
+<code-editor
+    class="form-textarea"
+    [style.height]="options.height.value + options.height.unit"
+    [theme]="options.theme"
+    [setup]="options.setup"
+    [disabled]="options.disabled"
+    [readonly]="options.readonly"
+    [placeholder]="options.placeholder"
+    [indentWithTab]="options.indentWithTab"
+    [indentUnit]="options.indentUnit"
+    [lineWrapping]="options.lineWrapping"
+    [highlightWhitespace]="options.highlightWhitespace"
+    [language]="options.language"
+    [languages]="languages"
+    [(ngModel)]="editorValue"
+    (ngModelChange)="handleEditorChange($event)"
+></code-editor>

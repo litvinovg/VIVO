@@ -1,0 +1,42 @@
+.graph-list {
+  margin-bottom: 20px;
+}
+
+.mat-table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.mat-table th,
+.mat-table td {
+  border: 1px solid #ccc;
+  padding: 8px;
+  text-align: left;
+}
+
+.mat-table th {
+  background-color: #f5f5f5;
+}
+
+.highlight {
+  background-color: #f0f0f0;
+}
+
+.form-container {
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.form-field {
+  width: 100%;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-field {
+  width: 100%;
+}
+
+

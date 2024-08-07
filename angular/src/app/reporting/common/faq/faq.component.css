@@ -1,0 +1,34 @@
+mat-accordion {
+  width: 80%;
+  margin: 20px auto;
+}
+
+mat-expansion-panel {
+  margin-bottom: 10px;
+}
+
+mat-panel-title {
+  font-weight: bold;
+}
+
+.content {
+  padding: 24px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background-color: white;
+  align-items: center;
+}
+
+.example-container {
+  flex-grow: 1;
+  min-width: 50%;
+  background-color: white;
+}
+
+.grid-container {
+  display: grid;
+  grid-template-columns: 180px auto;
+  height: 100vh;
+}

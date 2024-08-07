@@ -1,0 +1,112 @@
+<project
+        xmlns="http://maven.apache.org/POM/4.0.0"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.vivoweb</groupId>
+    <artifactId>vivo-angular</artifactId>
+    <version>1.14.1-SNAPSHOT</version>
+    <packaging>jar</packaging>
+
+    <parent>
+        <groupId>org.vivoweb</groupId>
+        <artifactId>vivo-project</artifactId>
+        <version>1.14.1-SNAPSHOT</version>
+        <relativePath>..</relativePath>
+    </parent>
+
+    <name>VIVO Angular</name>
+
+    <build>
+        <plugins>
+            <!-- ... other plugins ... -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.0.0</version>
+                <executions>
+                    <execution>
+                        <id>npm-install</id>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <phase>generate-resources</phase>
+                        <configuration>
+                            <executable>npm</executable>
+                            <workingDirectory>./angular</workingDirectory>
+                            <arguments>
+                                <argument>install</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>npm-build</id>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <phase>generate-resources</phase>
+                        <configuration>
+                            <executable>npm</executable>
+                            <workingDirectory>./angular</workingDirectory>
+                            <arguments>
+                                <argument>run</argument>
+                                <argument>build</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+          <plugin>
+            <artifactId>maven-clean-plugin</artifactId>
+            <version>3.1.0</version>
+            <executions>
+              <execution>
+                <id>clean-old-files</id>
+                <phase>pre-clean</phase>
+                <goals>
+                  <goal>clean</goal>
+                </goals>
+                <configuration>
+                  <!-- Specify the files or directories to be deleted -->
+                  <filesets>
+                    <fileset>
+                      <directory>/var/lib/tomcat9/webapps/vivo/rep</directory>
+                      <includes>
+                        <include>**/*</include>
+                      </includes>
+                    </fileset>
+                  </filesets>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+
+            <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy-report-resources</id>
+                        <phase>install</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <!-- Set the output directory to your Tomcat webapp -->
+                            <outputDirectory>/var/lib/tomcat9/webapps/vivo/rep</outputDirectory>
+                            <resources>
+                                <!-- Point to the output folder of your Angular project -->
+                                <resource>
+                                    <directory>dist/report</directory>
+                                    <filtering>false</filtering>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

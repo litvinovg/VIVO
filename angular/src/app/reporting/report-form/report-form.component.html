@@ -1,0 +1,72 @@
+<div class="grid-container">
+    <div class="menu">
+      <mat-sidenav mode="side" opened>
+        <mat-nav-list>
+          <mat-list-item>
+            <a mat-list-item routerLink="/">
+              <mat-icon>home</mat-icon>
+              <span>Home</span>
+            </a>
+          </mat-list-item>
+          <mat-list-item>
+            <a mat-list-item routerLink="/list">
+              <mat-icon>dashboard</mat-icon>
+              <span>List</span>
+            </a>
+          </mat-list-item>
+          <mat-list-item>
+            <a mat-list-item routerLink="/faq">
+              <mat-icon>question_answer</mat-icon>
+              <span>FAQ</span>
+            </a>
+          </mat-list-item>
+        </mat-nav-list>
+      </mat-sidenav>
+    </div>
+    <div class="content">
+      <mat-sidenav-container class="example-container">
+        <mat-sidenav-content>
+
+        <mat-horizontal-stepper #stepper (selectionChange)="onStepChange($event)" (click)="triggerClick()">
+          <mat-step label="Model definition" errorMessage="Required">
+            <report-construct-form (toggleControler)="hideStepperButtons($event)"></report-construct-form>
+            <div class="stepper-navigation" *ngIf="this.isButtonVisible">
+              <button mat-stroked-button color="primary" matStepperNext>Next</button>
+            </div>
+          </mat-step>
+          <mat-step label="Select from model">
+            <report-select-form (toggleControler)="hideStepperButtons($event)"></report-select-form>
+            <div class="stepper-navigation" *ngIf="this.isButtonVisible">
+              <button mat-stroked-button color="primary" matStepperPrevious>Back</button>
+              <button mat-stroked-button color="primary" matStepperNext>Next</button>
+            </div>
+          </mat-step>
+          <mat-step label="Reporting template">
+            <report-template-form (templateAdded)="handleTemplateAdded($event)"></report-template-form>
+            <div class="stepper-navigation">
+              <button mat-stroked-button color="primary" matStepperPrevious>Back</button>
+              <button mat-stroked-button color="primary" matStepperNext>Next</button>
+            </div>
+          </mat-step>
+          <mat-step label="Export">
+            <report-export-form
+              (reportNameChange)="updateReportName($event)"
+              (reportDescriptionChange)="updateReportDescription($event)"
+            ></report-export-form>
+            <div class="stepper-navigation">
+              <button
+                mat-raised-button
+                color="primary"
+                value="https://vivoweb.org/ontology/vitro-dynamic-api#dataSource"
+                (click)="saveReport()"
+              >
+                Save report
+              </button>
+            </div>
+          </mat-step>
+        </mat-horizontal-stepper>
+
+        </mat-sidenav-content>
+      </mat-sidenav-container>
+    </div>
+</div>

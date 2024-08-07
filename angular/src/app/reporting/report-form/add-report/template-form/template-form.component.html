@@ -1,0 +1,6 @@
+<app-material-file-uploader
+  requiredFileTypes="application/vnd.openxmlformats-officedocument.wordprocessingml.document, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+  (fileSelected)="handleFileAdded($event)"
+  (fileDropped)="handleFileAdded($event)"
+  (fileRemoved)="handleFileRemoved()"
+></app-material-file-uploader>
