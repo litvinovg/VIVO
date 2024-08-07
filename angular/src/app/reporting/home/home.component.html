@@ -1,0 +1,30 @@
+<div class="grid-container">
+  <app-menu></app-menu>
+  <div class="content">
+    <mat-sidenav-container class="example-container">
+      <mat-sidenav-content>
+        <div class="home-container">
+          <h1>Generate Reports</h1>
+          <p>Welcome to the report generation section. Here, you can create and view various reports based on your data.</p>
+
+          <div class="features">
+            <h2>Key Features</h2>
+            <ul>
+              <li>Easy-to-use interface for generating reports</li>
+              <li>Support for multiple output formats including XLSX and DOCX</li>
+              <li>Customizable reporting templates</li>
+              <li>Dynamic data selection from models</li>
+              <li>Export and share your reports effortlessly</li>
+            </ul>
+          </div>
+
+          <div class="actions">
+            <button mat-raised-button color="primary" routerLink="/add">Create New Report</button>
+            <button mat-raised-button color="accent" routerLink="/list">View Existing Reports</button>
+          </div>
+        </div>
+      </mat-sidenav-content>
+    </mat-sidenav-container>
+  </div>
+</div>
+

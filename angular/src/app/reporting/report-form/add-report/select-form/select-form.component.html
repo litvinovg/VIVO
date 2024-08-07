@@ -1,0 +1,88 @@
+<div class="select-list" *ngIf="!toggleOn">
+  <div class="select-list mat-table">
+    <table mat-table [dataSource]="dataSource">
+
+      <ng-container matColumnDef="name">
+        <th mat-header-cell *matHeaderCellDef>Name</th>
+        <td mat-cell *matCellDef="let element">{{element.name}}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="description">
+        <th mat-header-cell *matHeaderCellDef>Description</th>
+        <td mat-cell *matCellDef="let element">{{element.description}}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="graph">
+        <th mat-header-cell *matHeaderCellDef>Graph</th>
+        <td mat-cell *matCellDef="let element">{{element.graph}}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="action">
+        <th mat-header-cell *matHeaderCellDef></th>
+        <td mat-cell *matCellDef="let element">
+          <button mat-icon-button color="primary" (click)="edit(element.name)">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button mat-icon-button color="primary" (click)="remove(element.name)">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns" [ngClass]="{'highlight': selectedRowIndex == row.id}" (click)="highlight(row)"></tr>
+    </table>
+  </div>
+  <br>
+  <button mat-raised-button color="primary" (click)="toggleInstructions($event)">New graph</button>
+</div>
+
+<div *ngIf="toggleOn" class="add-form-container">
+  <form [formGroup]="selectQueryForm" (ngSubmit)="onSubmit()" class="add-form">
+    <h3>Provide select query</h3>
+    <div class="flex">
+
+      <div class="form-group">
+        <mat-form-field class="vertical-mat-form col">
+          <mat-label>Name</mat-label>
+          <input formControlName="name" matInput placeholder="Enter name of data" />
+        </mat-form-field>
+      </div>
+
+      <div class="form-group">
+        <mat-form-field class="vertical-mat-form col">
+          <mat-label>Description</mat-label>
+          <input formControlName="description" matInput placeholder="Enter description of data" />
+        </mat-form-field>
+      </div>
+
+      <div class="form-group">
+          <mat-label>Query:</mat-label>
+          <app-sparql-editor-area formControlName="selectQuery" />
+          <mat-error *ngIf="selectQueryForm.controls['selectQuery'].invalid">Please enter a valid select
+            query</mat-error>
+      </div>
+
+      <div class="form-group">
+        <mat-form-field appearance="fill">
+          <mat-label>Graph</mat-label>
+          <mat-select formControlName="graph">
+            <mat-option *ngFor="let item of array" [value]="item.name">
+              {{ item.name }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <div class="button-group">
+        <button mat-raised-button color="warn" type="button" (click)=toggleInstructions($event)>
+          Cancel
+        </button>
+        <button mat-raised-button color="primary" >
+          Submit
+        </button>
+      </div>
+    </div>
+  </form>
+</div>
+

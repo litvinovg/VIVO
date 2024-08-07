@@ -101,6 +101,7 @@
     <modules>
         <module>home</module>
         <module>webapp</module>
+        <module>../angular</module>
     </modules>
     <dependencyManagement>
         <dependencies>
@@ -120,6 +121,11 @@
                 <artifactId>vivo-webapp</artifactId>
                 <version>${vitro-version}</version>
                 <type>war</type>
+            </dependency>
+            <dependency>
+                <groupId>org.vivoweb</groupId>
+                <artifactId>vivo-angular</artifactId>
+                <version>1.14.1-SNAPSHOT</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
