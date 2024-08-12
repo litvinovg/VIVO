@@ -7,7 +7,6 @@ import { ConstructFormComponent } from './report-form/add-report/construct-form/
 import { SelectFormComponent } from './report-form/add-report/select-form/select-form.component';
 import { TemplateFormComponent } from './report-form/add-report/template-form/template-form.component';
 import { ExportFormComponent } from './report-form/add-report/export-form/export-form.component';
-import {HttpClientModule} from '@angular/common/http';
 
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import { SubsetsRoutingModule } from './reporting-routing.module';
@@ -42,7 +41,6 @@ import {MatTooltip} from "@angular/material/tooltip";
         CommonModule,
         MaterialModule,
         ReactiveFormsModule,
-        HttpClientModule,
         SubsetsRoutingModule,
         FormsModule,
         CodeEditor,
