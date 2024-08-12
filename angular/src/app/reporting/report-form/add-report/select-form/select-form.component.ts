@@ -1,6 +1,5 @@
 import {Component, EventEmitter, OnInit, Output} from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { HttpClient } from '@angular/common/http';
 import { StepperDataService } from 'src/app/reporting/services/stepper-data.service';
 import { Subscription } from 'rxjs';
 import {Select} from "../../../models/select";

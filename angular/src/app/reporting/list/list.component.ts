@@ -136,7 +136,7 @@ export class ListComponent implements OnInit, AfterViewInit {
     return new Blob(byteArrays, { type: contentType });
   }
 
-  downloadSettings(resourceId: string) {
+  downloadConfig(resourceId: string) {
     this.reportService.export(resourceId).subscribe((response) => {
       const configGraph = response.report_generator_configuration_graph;
       const blob = new Blob([configGraph], {type: 'text/plain'});

@@ -1,5 +1,4 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import { FormBuilder, FormGroup } from '@angular/forms';
 import {StepperDataService} from "../../../services/stepper-data.service";
 
 @Component({
@@ -9,13 +8,11 @@ import {StepperDataService} from "../../../services/stepper-data.service";
 })
 export class TemplateFormComponent {
 
-  templateForm!: FormGroup;
   @Output() templateAdded = new EventEmitter<string>();
   @Input() fileSelected!: EventEmitter<File>;
   @Input() fileDropped!: EventEmitter<File>;
 
-  constructor(private formBuilder: FormBuilder,
-              private stepperDataService: StepperDataService) { }
+  constructor(private stepperDataService: StepperDataService) { }
 
   handleFileAdded = (file:File) => {
       const reader = new FileReader();

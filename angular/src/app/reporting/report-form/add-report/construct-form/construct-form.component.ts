@@ -1,9 +1,8 @@
-import {AfterViewInit, Component, ElementRef, EventEmitter, OnInit, Output, ViewChild,} from '@angular/core';
+import {Component, EventEmitter, OnInit, Output} from '@angular/core';
 import { FormGroup, FormBuilder, Validators, FormArray } from '@angular/forms';
 import { MatTableDataSource } from '@angular/material/table';
 import { StepperDataService } from 'src/app/reporting/services/stepper-data.service';
 import {Construct} from "../../../models/construct";
-import {languages} from "@codemirror/language-data";
 
 @Component({
   selector: 'report-construct-form',

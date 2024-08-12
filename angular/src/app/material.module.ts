@@ -13,8 +13,8 @@ import { MatListModule } from '@angular/material/list';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSidenavModule } from '@angular/material/sidenav';
-import {MatCardModule} from "@angular/material/card";
-import {MatDialogModule} from "@angular/material/dialog";
+import { MatCardModule } from "@angular/material/card";
+import { MatDialogModule } from "@angular/material/dialog";
 
 const materialModules = [
   MatIconModule,
