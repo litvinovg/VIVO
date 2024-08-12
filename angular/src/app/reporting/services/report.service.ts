@@ -1,9 +1,8 @@
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Report } from '../models/report';
-import { environment } from 'src/environments/environment';
 import { Injectable } from '@angular/core';
 import {ApiResponse} from "../models/apiresponse";
-const baseUrl = `${environment.vivoUrl}/rest/1/report_generator`;
+const baseUrl = `api/rest/1/report_generator`;
 
 @Injectable({ providedIn: 'root' })
 export class ReportService {
@@ -38,7 +37,6 @@ export class ReportService {
   }
 
   delete(id: string) {
-    console.log('Delete from report service\n');
     return this.http.delete(`${baseUrl}/resource:${id}`);
   }
 
