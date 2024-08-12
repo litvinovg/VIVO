@@ -18,7 +18,6 @@ import {DragAndDrop} from "../drag-and-drop/drag-and-drop";
 import { ConfirmDialogComponent } from './common/confirm-dialog/confirm-dialog.component';
 import { FaqComponent } from './common/faq/faq.component';
 import { MenuComponent } from './common/menu/menu.component';
-import { ImportReportDialogComponent } from './common/import-report-dialog/import-report-dialog.component';
 import {CodeEditor} from "@acrodata/code-editor";
 
 import {SparqlEditorAreaComponent} from "./common/sparql-editor-area/sparql-editor-area.component";
@@ -37,8 +36,7 @@ import {MatTooltip} from "@angular/material/tooltip";
     DragAndDrop,
     ConfirmDialogComponent,
     FaqComponent,
-    MenuComponent,
-    ImportReportDialogComponent
+    MenuComponent
   ],
     imports: [
         CommonModule,

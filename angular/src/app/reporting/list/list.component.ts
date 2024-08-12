@@ -7,7 +7,7 @@ import {ReportService} from '../services/report.service';
 import {UpdReport} from "../models/updReport";
 import {ConfirmDialogComponent} from "../common/confirm-dialog/confirm-dialog.component";
 import {MatDialog} from '@angular/material/dialog';
-import {ImportReportDialogComponent} from "../common/import-report-dialog/import-report-dialog.component";
+import {MatSnackBar} from "@angular/material/snack-bar";
 
 interface ApiResponse {
   reports: UpdReport[];
@@ -21,7 +21,6 @@ interface ApiResponse {
 export class ListComponent implements OnInit, AfterViewInit {
   displayedColumns: string[] = ['name', 'description', 'action'];
   report!: Report[];
-  selects!: Report[];
   selectedRowIndex = -1;
 
   dataSource = new MatTableDataSource<UpdReport>([]);
@@ -29,7 +28,8 @@ export class ListComponent implements OnInit, AfterViewInit {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
   constructor(private reportService: ReportService,
-              private dialog: MatDialog) {}
+              private dialog: MatDialog,
+              private snackBar: MatSnackBar) {}
 
   ngOnInit(): void {
     this.getData();
@@ -51,7 +51,6 @@ export class ListComponent implements OnInit, AfterViewInit {
       .delete(btoa(resourceId))
       .pipe(first())
       .subscribe(() => {
-        // Update the dataSource after deletion
         this.dataSource.data = this.dataSource.data.filter(
           (r) => r.resource_id.value !== resourceId
         );
@@ -68,16 +67,19 @@ export class ListComponent implements OnInit, AfterViewInit {
     });
   }
 
-  openImportDialog(): void {
-    const dialogRef = this.dialog.open(ImportReportDialogComponent, {
-      width: '600px'
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        this.importReport(result);
+  onFileSelected(event: any) {
+    const file: File = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.readAsText(file);
+      reader.onloadend = () => {
+        if (reader.result) {
+          this.importReport(reader.result.toString());
+        } else {
+          console.error('File reading failed. reader.result is null.');
+        }
       }
-    });
+    }
   }
 
   importReport(configurationGraph: string): void {
@@ -85,19 +87,19 @@ export class ListComponent implements OnInit, AfterViewInit {
       .pipe(first())
       .subscribe({
         next: () => {
-          console.log('Imported configuration graph:', configurationGraph);
-          this.getData();  // Refresh data source
+          this.getData();
+          this.showSnackBar('Success: Report configuration imported successfully!', 'success');
         },
-        error: (error) => {
-          console.error('Error importing configuration graph:', error);
+        error: () => {
+          this.showSnackBar('Error: Config file is not correct.', 'error');
         }
       });
   }
 
-  editReport(resourceId: string) {
-    fetch('http://localhost:8080/vitro/api/rest/1/report_generator', {
-      method: 'GET',
-    }).then(r => console.log(r));
+  public showSnackBar(message: string, type: 'success' | 'error'): void {
+    this.snackBar.open(message, 'Close', {
+      verticalPosition: 'top',
+    });
   }
 
   downloadReport(resourceId: string) {
