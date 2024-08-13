@@ -4,7 +4,7 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve --open",
-    "build": "ng build --base-href /vivo/rep --deploy-url /vivo/rep/",
+    "build": "ng build --base-href ./ --deploy-url ./",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },

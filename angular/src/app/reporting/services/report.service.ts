@@ -2,18 +2,17 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Report } from '../models/report';
 import { Injectable } from '@angular/core';
 import {ApiResponse} from "../models/apiresponse";
-const baseUrl = `api/rest/1/report_generator`;
 
 @Injectable({ providedIn: 'root' })
 export class ReportService {
   constructor(private http: HttpClient) {}
 
   getAll() {
-    return this.http.get<ApiResponse>(`${baseUrl}`);
+    return this.http.get<ApiResponse>(this.getBaseUrl());
   }
 
   getById(id: string) {
-    return this.http.get<Report>(`${baseUrl}/resource:${id}`);
+    return this.http.get<Report>(this.getBaseUrl() + `/resource:${id}`);
   }
 
   create(params: any) {
@@ -27,17 +26,18 @@ export class ReportService {
 
     console.log('Body with vivoweb ontology: ' + JSON.stringify(body));
     return this.http.post(
-      `${baseUrl}`,
+      this.getBaseUrl(),
       body,
     );
   }
 
   update(id: string, params: any) {
-    return this.http.put(`${baseUrl}/${id}`, params);
+    return this.http.put(this.getBaseUrl() + `/${id}`, params);
   }
 
   delete(id: string) {
-    return this.http.delete(`${baseUrl}/resource:${id}`);
+    console.log('Delete from report service\n');
+    return this.http.delete(this.getBaseUrl() + `/resource:${id}`);
   }
 
   download(id: string) {
@@ -46,7 +46,7 @@ export class ReportService {
     };
 
     return this.http.post(
-      `${baseUrl}`,
+      this.getBaseUrl(),
       body,
     );
   }
@@ -57,7 +57,7 @@ export class ReportService {
     };
 
     return this.http.post(
-      `${baseUrl}/import_report_generator`,
+      this.getBaseUrl() + '/import_report_generator',
       body,
     );
   }
@@ -68,7 +68,7 @@ export class ReportService {
     };
 
     return this.http.post<{report_generator_configuration_graph: string}>(
-      `${baseUrl}/export_report_generator`,
+      this.getBaseUrl() + '/export_report_generator',
       body,
     );
   }
@@ -79,8 +79,11 @@ export class ReportService {
     };
 
     return this.http.post<{report: string}>(
-      `${baseUrl}/execute_report_generator`,
+      this.getBaseUrl() + '/execute_report_generator',
       body,
     );
+  }
+  getBaseUrl() {
+     return window.location.protocol + "//" + window.location.host + "/" + window.location.pathname.split('/')[1] + '/api/rest/1/report_generator';
   }
 }

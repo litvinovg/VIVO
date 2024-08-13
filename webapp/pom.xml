@@ -21,6 +21,43 @@
 
     <build>
         <plugins>
+	    <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>3.6.1</version>
+                <executions>
+                    <execution>
+                        <id>unpack-webjars</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>org.vivoweb</groupId>
+                                    <artifactId>vivo-angular</artifactId>
+                                    <type>jar</type>
+                                    <includes>
+                                        META-INF/*.css,
+                                        META-INF/*.js,
+                                        META-INF/*.html
+                                    </includes>
+                                    <fileMappers>
+                                        <org.codehaus.plexus.components.io.filemappers.RegExpFileMapper>
+                                            <pattern>^META-INF/</pattern>
+                                            <replacement>./</replacement>
+                                        </org.codehaus.plexus.components.io.filemappers.RegExpFileMapper>
+                                    </fileMappers>
+                                    <outputDirectory>target/${project.artifactId}-${project.version}/webjars/rep/</outputDirectory>
+                                </artifactItem>
+                            </artifactItems>
+                            <overWriteReleases>true</overWriteReleases>
+                            <overWriteSnapshots>true</overWriteSnapshots>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
@@ -69,6 +106,11 @@
         <dependency>
             <groupId>org.vivoweb</groupId>
             <artifactId>vivo-api</artifactId>
+            <version>1.14.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.vivoweb</groupId>
+            <artifactId>vivo-angular</artifactId>
             <version>1.14.1-SNAPSHOT</version>
         </dependency>
     </dependencies>

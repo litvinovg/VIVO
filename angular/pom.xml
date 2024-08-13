@@ -20,7 +20,6 @@
 
     <build>
         <plugins>
-            <!-- ... other plugins ... -->
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
@@ -57,56 +56,20 @@
                     </execution>
                 </executions>
             </plugin>
-
-          <plugin>
-            <artifactId>maven-clean-plugin</artifactId>
-            <version>3.1.0</version>
-            <executions>
-              <execution>
-                <id>clean-old-files</id>
-                <phase>pre-clean</phase>
-                <goals>
-                  <goal>clean</goal>
-                </goals>
-                <configuration>
-                  <!-- Specify the files or directories to be deleted -->
-                  <filesets>
-                    <fileset>
-                      <directory>/var/lib/tomcat9/webapps/vivo/rep</directory>
-                      <includes>
-                        <include>**/*</include>
-                      </includes>
-                    </fileset>
-                  </filesets>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-
-            <plugin>
-                <artifactId>maven-resources-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>copy-report-resources</id>
-                        <phase>install</phase>
-                        <goals>
-                            <goal>copy-resources</goal>
-                        </goals>
-                        <configuration>
-                            <!-- Set the output directory to your Tomcat webapp -->
-                            <outputDirectory>/var/lib/tomcat9/webapps/vivo/rep</outputDirectory>
-                            <resources>
-                                <!-- Point to the output folder of your Angular project -->
-                                <resource>
-                                    <directory>dist/report</directory>
-                                    <filtering>false</filtering>
-                                </resource>
-                            </resources>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
         </plugins>
+        <resources>
+            <resource>
+                <directory>dist/report</directory>
+		<includes>
+                    <include>*.js</include>
+                    <include>*.txt</include>
+                    <include>*.css</include>
+                    <include>*.html</include>
+                </includes>
+                <targetPath>META-INF</targetPath>
+            </resource>
+	</resources>
+
     </build>
 
 </project>
