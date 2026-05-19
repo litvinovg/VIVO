@@ -1,0 +1,13 @@
+services:
+  joai:
+    hostname: joai
+    container_name: joai
+    environment:
+      - VIVO_URL=http://vivo:${VIVO_CONTAINER_PORT}
+    networks:
+      - vivoweb
+    ports:
+      - ${JOAI_HOST_PORT}:${JOAI_CONTAINER_PORT}
+    build:
+      context: ./oai
+

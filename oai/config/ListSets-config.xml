@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<ListSets>
+  <set>
+    <setSpec>equipment</setSpec>
+    <setName>equipment</setName>
+    <virtualSearchField field="setSpec">
+      <virtualSearchTermDefinition term="equipment">
+        <Query>
+          <booleanQuery type="OR">
+            <booleanQuery type="OR" excludeOrRequire="require">
+              <textQuery field="docdir" type="matchKeyword">/joai/data/equipment</textQuery>
+            </booleanQuery>
+          </booleanQuery>
+        </Query>
+      </virtualSearchTermDefinition>
+    </virtualSearchField>
+  </set>
+  <set>
+    <setSpec>events</setSpec>
+    <setName>events</setName>
+    <virtualSearchField field="setSpec">
+      <virtualSearchTermDefinition term="events">
+        <Query>
+          <booleanQuery type="OR">
+            <booleanQuery type="OR" excludeOrRequire="require">
+              <textQuery field="docdir" type="matchKeyword">/joai/data/events</textQuery>
+            </booleanQuery>
+          </booleanQuery>
+        </Query>
+      </virtualSearchTermDefinition>
+    </virtualSearchField>
+  </set>
+  <set>
+    <setSpec>fundings</setSpec>
+    <setName>fundings</setName>
+    <virtualSearchField field="setSpec">
+      <virtualSearchTermDefinition term="fundings">
+        <Query>
+          <booleanQuery type="OR">
+            <booleanQuery type="OR" excludeOrRequire="require">
+              <textQuery field="docdir" type="matchKeyword">/joai/data/fundings</textQuery>
+            </booleanQuery>
+          </booleanQuery>
+        </Query>
+      </virtualSearchTermDefinition>
+    </virtualSearchField>
+  </set>
+  <set>
+    <setSpec>organizations</setSpec>
+    <setName>organizations</setName>
+    <virtualSearchField field="setSpec">
+      <virtualSearchTermDefinition term="organizations">
+        <Query>
+          <booleanQuery type="OR">
+            <booleanQuery type="OR" excludeOrRequire="require">
+              <textQuery field="docdir" type="matchKeyword">/joai/data/organizations</textQuery>
+            </booleanQuery>
+          </booleanQuery>
+        </Query>
+      </virtualSearchTermDefinition>
+    </virtualSearchField>
+  </set>
+  <set>
+    <setSpec>patents</setSpec>
+    <setName>patents</setName>
+    <virtualSearchField field="setSpec">
+      <virtualSearchTermDefinition term="patents">
+        <Query>
+          <booleanQuery type="OR">
+            <booleanQuery type="OR" excludeOrRequire="require">
+              <textQuery field="docdir" type="matchKeyword">/joai/data/patents</textQuery>
+            </booleanQuery>
+          </booleanQuery>
+        </Query>
+      </virtualSearchTermDefinition>
+    </virtualSearchField>
+  </set>
+  <set>
+    <setSpec>persons</setSpec>
+    <setName>persons</setName>
+    <virtualSearchField field="setSpec">
+      <virtualSearchTermDefinition term="persons">
+        <Query>
+          <booleanQuery type="OR">
+            <booleanQuery type="OR" excludeOrRequire="require">
+              <textQuery field="docdir" type="matchKeyword">/joai/data/persons</textQuery>
+            </booleanQuery>
+          </booleanQuery>
+        </Query>
+      </virtualSearchTermDefinition>
+    </virtualSearchField>
+  </set>
+  <set>
+    <setSpec>products</setSpec>
+    <setName>products</setName>
+    <virtualSearchField field="setSpec">
+      <virtualSearchTermDefinition term="products">
+        <Query>
+          <booleanQuery  type="OR">
+            <booleanQuery  type="OR" excludeOrRequire="require">
+              <textQuery field="docdir" type="matchKeyword">/joai/data/products</textQuery>
+            </booleanQuery >
+          </booleanQuery >
+        </Query>
+      </virtualSearchTermDefinition>
+    </virtualSearchField>
+  </set>
+  <set>
+    <setSpec>publications</setSpec>
+    <setName>publications</setName>
+    <virtualSearchField field="setSpec">
+      <virtualSearchTermDefinition term="publications">
+        <Query>
+          <booleanQuery type="OR">
+            <booleanQuery type="OR" excludeOrRequire="require">
+              <textQuery field="docdir" type="matchKeyword">/joai/data/publications</textQuery>
+            </booleanQuery>
+          </booleanQuery>
+        </Query>
+      </virtualSearchTermDefinition>
+    </virtualSearchField>
+  </set>
+</ListSets>
