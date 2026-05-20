@@ -2,6 +2,9 @@ services:
   joai:
     hostname: joai
     container_name: joai
+    volumes:
+      - /joai/config:Z
+      - /joai/data:Z
     environment:
       - VIVO_URL=http://vivo:${VIVO_CONTAINER_PORT}
     networks:
