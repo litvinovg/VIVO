@@ -50,6 +50,22 @@
         :graphBuilder           :3ea0fd15-73b7-4cd5-8ba6-3bd004da6398 ;
         :rdfLang                "RDF/XML" .
 
+:90419f7a-bedb-4e02-8505-4462ec919443
+        a                       <java:edu.cornell.library.scholars.webapp.controller.api.distribute.DataDistributor> , <java:edu.cornell.library.scholars.webapp.controller.api.distribute.rdf.RdfGraphDistributor> ;
+        vitro:mostSpecificType  <java:edu.cornell.library.scholars.webapp.controller.api.distribute.DataDistributor> , <java:edu.cornell.library.scholars.webapp.controller.api.distribute.rdf.RdfGraphDistributor> ;
+        :actionName             "OAI PMH Projects" ;
+        :graphBuilder           :7e49263f-bb4a-4394-8e13-f4a2b643ec32 ;
+        :rdfLang                "RDF/XML" .
+
+:7e49263f-bb4a-4394-8e13-f4a2b643ec32
+        a                       <java:edu.cornell.library.scholars.webapp.controller.api.distribute.rdf.graphbuilder.ConstructQueryGraphBuilder> , <java:edu.cornell.library.scholars.webapp.controller.api.distribute.rdf.graphbuilder.GraphBuilder> ;
+        vitro:mostSpecificType  <java:edu.cornell.library.scholars.webapp.controller.api.distribute.rdf.graphbuilder.ConstructQueryGraphBuilder> , <java:edu.cornell.library.scholars.webapp.controller.api.distribute.rdf.graphbuilder.GraphBuilder> ;
+        :builderName            "OAI PMH Projects" ;
+        :constructQuery         "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\r\nPREFIX vivo: <http://vivoweb.org/ontology/core#>\r\nPREFIX vitro: <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#>\r\nCONSTRUCT {\r\n  ?project rdfs:comment \"OpenAIRE Projects\" .\r\n  ?project ?p ?o .\r\n}\r\nWHERE {\r\n  BIND (?uri as ?project)\r\n  ?project a vivo:Project .\r\n  ?project rdfs:label|vitro:mostSpecificType|a ?o .\r\n  ?project ?p ?o .\r\n}" ;
+        :uriBinding             "uri" .
+
+
+
 :7e49263f-bb4a-4394-8e13-f4a2b643ec56
         a                       <java:edu.cornell.library.scholars.webapp.controller.api.distribute.rdf.graphbuilder.ConstructQueryGraphBuilder> , <java:edu.cornell.library.scholars.webapp.controller.api.distribute.rdf.graphbuilder.GraphBuilder> ;
         vitro:mostSpecificType  <java:edu.cornell.library.scholars.webapp.controller.api.distribute.rdf.graphbuilder.ConstructQueryGraphBuilder> , <java:edu.cornell.library.scholars.webapp.controller.api.distribute.rdf.graphbuilder.GraphBuilder> ;
