@@ -19,7 +19,12 @@ RUN mkdir /war
 
 WORKDIR /war
 RUN unzip /tmp/joai-project/dist/oai.war
-RUN sed -i '/WEB-INF\/xsl_files/a\    <context-param>\n      <param-name>xslconverter - VIVO RDF/XML to openAIRE converter</param-name>\n      <param-value>rdf_to_openaire.xsl|rdf|openaire</param-value>\n    </context-param>' WEB-INF/web.xml
+
+#Metadata format conversion
+RUN sed -i '/WEB-INF\/xsl_files/a\    <context-param>\n      <param-name>xslconverter - VIVO RDF/XML to openAIRE converter</param-name>\n      <param-value>rdf_to_openaire.xsl|rdf|oai_cerif_openaire_v1_2</param-value>\n    </context-param>' WEB-INF/web.xml
+
+#OpenAIRE format description
+RUN sed -i '/org.dlese.dpc.oai.provider.OAIProviderServlet/a\    <init-param>\n      <param-name>xmlformatinfo - oai_cerif_openaire_v1_2 schema and namespace</param-name>\n      <param-value>oai_cerif_openaire_v1_2|https://www.openaire.eu/schema/cris/1.2/openaire-cerif-profile.xsd|https://www.openaire.eu/cerif-profile/1.2/</param-value>\n    </init-param>' WEB-INF/web.xml
 
 WORKDIR /usr/local/rdf-to-openaire
 RUN mvn install
@@ -54,8 +59,12 @@ RUN chmod 0744 /joai/config/start.sh
 
 COPY config/ /joai/config/repository/
 
-WORKDIR /usr/local/tomcat
+WORKDIR /usr/local/tomcat/conf
+RUN openssl req -new -newkey rsa:4096 -days 36500 -nodes -x509 -subj "/C=US/ST=Denial/L=Springfield/O=Dis/CN=example.com" -keyout key.pem -out cert.pem
+RUN sed -i '/<Service name="Catalina">/a\    <Connector port="8443" protocol="org.apache.coyote.http11.Http11AprProtocol"\n               maxThreads="150" SSLEnabled="true" >\n        <UpgradeProtocol className="org.apache.coyote.http2.Http2Protocol" />\n        <SSLHostConfig>\n            <Certificate certificateKeyFile="conf/key.pem"\n                         certificateFile="conf/cert.pem"\n                         type="RSA" />\n        </SSLHostConfig>\n    </Connector>' server.xml
 
+
+WORKDIR /usr/local/tomcat
 CMD ["/joai/config/start.sh"]
 
 # just the config

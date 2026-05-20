@@ -11,6 +11,7 @@ services:
       - vivoweb
     ports:
       - ${JOAI_HOST_PORT}:${JOAI_CONTAINER_PORT}
+      - ${JOAI_HOST_HTTPS_PORT}:${JOAI_CONTAINER_HTTPS_PORT}
     build:
       context: ./oai
 
