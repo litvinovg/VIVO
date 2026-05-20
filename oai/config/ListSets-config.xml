@@ -2,8 +2,8 @@
 
 <ListSets>
   <set>
-    <setSpec>equipment</setSpec>
-    <setName>equipment</setName>
+    <setSpec>openaire_cris_equipment</setSpec>
+    <setName>openaire_cris_equipment</setName>
     <virtualSearchField field="setSpec">
       <virtualSearchTermDefinition term="equipment">
         <Query>
@@ -17,8 +17,8 @@
     </virtualSearchField>
   </set>
   <set>
-    <setSpec>events</setSpec>
-    <setName>events</setName>
+    <setSpec>openaire_cris_events</setSpec>
+    <setName>openaire_cris_events</setName>
     <virtualSearchField field="setSpec">
       <virtualSearchTermDefinition term="events">
         <Query>
@@ -32,8 +32,8 @@
     </virtualSearchField>
   </set>
   <set>
-    <setSpec>fundings</setSpec>
-    <setName>fundings</setName>
+    <setSpec>openaire_cris_fundings</setSpec>
+    <setName>openaire_cris_fundings</setName>
     <virtualSearchField field="setSpec">
       <virtualSearchTermDefinition term="fundings">
         <Query>
@@ -47,8 +47,8 @@
     </virtualSearchField>
   </set>
   <set>
-    <setSpec>organizations</setSpec>
-    <setName>organizations</setName>
+    <setSpec>openaire_cris_organizations</setSpec>
+    <setName>openaire_cris_organizations</setName>
     <virtualSearchField field="setSpec">
       <virtualSearchTermDefinition term="organizations">
         <Query>
@@ -62,8 +62,8 @@
     </virtualSearchField>
   </set>
   <set>
-    <setSpec>patents</setSpec>
-    <setName>patents</setName>
+    <setSpec>openaire_cris_patents</setSpec>
+    <setName>openaire_cris_patents</setName>
     <virtualSearchField field="setSpec">
       <virtualSearchTermDefinition term="patents">
         <Query>
@@ -77,8 +77,8 @@
     </virtualSearchField>
   </set>
   <set>
-    <setSpec>persons</setSpec>
-    <setName>persons</setName>
+    <setSpec>openaire_cris_persons</setSpec>
+    <setName>openaire_cris_persons</setName>
     <virtualSearchField field="setSpec">
       <virtualSearchTermDefinition term="persons">
         <Query>
@@ -92,8 +92,8 @@
     </virtualSearchField>
   </set>
   <set>
-    <setSpec>products</setSpec>
-    <setName>products</setName>
+    <setSpec>openaire_cris_products</setSpec>
+    <setName>openaire_cris_products</setName>
     <virtualSearchField field="setSpec">
       <virtualSearchTermDefinition term="products">
         <Query>
@@ -107,8 +107,8 @@
     </virtualSearchField>
   </set>
   <set>
-    <setSpec>publications</setSpec>
-    <setName>publications</setName>
+    <setSpec>openaire_cris_publications</setSpec>
+    <setName>openaire_cris_publications</setName>
     <virtualSearchField field="setSpec">
       <virtualSearchTermDefinition term="publications">
         <Query>
