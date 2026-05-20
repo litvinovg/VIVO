@@ -2,14 +2,14 @@
 
 <ListSets>
   <set>
-    <setSpec>openaire_cris_equipment</setSpec>
-    <setName>OpenAIRE_CRIS_equipment</setName>
+    <setSpec>openaire_cris_equipments</setSpec>
+    <setName>OpenAIRE_CRIS_equipments</setName>
     <virtualSearchField field="setSpec">
-      <virtualSearchTermDefinition term="equipment">
+      <virtualSearchTermDefinition term="openaire_cris_equipments">
         <Query>
           <booleanQuery type="OR">
             <booleanQuery type="OR" excludeOrRequire="require">
-              <textQuery field="docdir" type="matchKeyword">/joai/data/equipment</textQuery>
+              <textQuery field="docdir" type="matchKeyword">/joai/data/equipments</textQuery>
             </booleanQuery>
           </booleanQuery>
         </Query>
@@ -20,7 +20,7 @@
     <setSpec>openaire_cris_events</setSpec>
     <setName>OpenAIRE_CRIS_events</setName>
     <virtualSearchField field="setSpec">
-      <virtualSearchTermDefinition term="events">
+      <virtualSearchTermDefinition term="openaire_cris_events">
         <Query>
           <booleanQuery type="OR">
             <booleanQuery type="OR" excludeOrRequire="require">
@@ -32,14 +32,14 @@
     </virtualSearchField>
   </set>
   <set>
-    <setSpec>openaire_cris_fundings</setSpec>
-    <setName>OpenAIRE_CRIS_fundings</setName>
+    <setSpec>openaire_cris_funding</setSpec>
+    <setName>OpenAIRE_CRIS_funding</setName>
     <virtualSearchField field="setSpec">
-      <virtualSearchTermDefinition term="fundings">
+      <virtualSearchTermDefinition term="openaire_cris_funding">
         <Query>
           <booleanQuery type="OR">
             <booleanQuery type="OR" excludeOrRequire="require">
-              <textQuery field="docdir" type="matchKeyword">/joai/data/fundings</textQuery>
+              <textQuery field="docdir" type="matchKeyword">/joai/data/funding</textQuery>
             </booleanQuery>
           </booleanQuery>
         </Query>
@@ -50,11 +50,11 @@
     <setSpec>openaire_cris_orgunits</setSpec>
     <setName>OpenAIRE_CRIS_orgunits</setName>
     <virtualSearchField field="setSpec">
-      <virtualSearchTermDefinition term="organizations">
+      <virtualSearchTermDefinition term="openaire_cris_orgunits">
         <Query>
           <booleanQuery type="OR">
             <booleanQuery type="OR" excludeOrRequire="require">
-              <textQuery field="docdir" type="matchKeyword">/joai/data/organizations</textQuery>
+              <textQuery field="docdir" type="matchKeyword">/joai/data/orgunits</textQuery>
             </booleanQuery>
           </booleanQuery>
         </Query>
@@ -65,7 +65,7 @@
     <setSpec>openaire_cris_patents</setSpec>
     <setName>OpenAIRE_CRIS_patents</setName>
     <virtualSearchField field="setSpec">
-      <virtualSearchTermDefinition term="patents">
+      <virtualSearchTermDefinition term="openaire_cris_patents">
         <Query>
           <booleanQuery type="OR">
             <booleanQuery type="OR" excludeOrRequire="require">
@@ -80,7 +80,7 @@
     <setSpec>openaire_cris_persons</setSpec>
     <setName>OpenAIRE_CRIS_persons</setName>
     <virtualSearchField field="setSpec">
-      <virtualSearchTermDefinition term="persons">
+      <virtualSearchTermDefinition term="openaire_cris_persons">
         <Query>
           <booleanQuery type="OR">
             <booleanQuery type="OR" excludeOrRequire="require">
@@ -95,13 +95,28 @@
     <setSpec>openaire_cris_products</setSpec>
     <setName>OpenAIRE_CRIS_products</setName>
     <virtualSearchField field="setSpec">
-      <virtualSearchTermDefinition term="products">
+      <virtualSearchTermDefinition term="openaire_cris_products">
         <Query>
-          <booleanQuery  type="OR">
-            <booleanQuery  type="OR" excludeOrRequire="require">
+          <booleanQuery type="OR">
+            <booleanQuery type="OR" excludeOrRequire="require">
               <textQuery field="docdir" type="matchKeyword">/joai/data/products</textQuery>
-            </booleanQuery >
-          </booleanQuery >
+            </booleanQuery>
+          </booleanQuery>
+        </Query>
+      </virtualSearchTermDefinition>
+    </virtualSearchField>
+  </set>
+  <set>
+    <setSpec>openaire_cris_projects</setSpec>
+    <setName>OpenAIRE_CRIS_projects</setName>
+    <virtualSearchField field="setSpec">
+      <virtualSearchTermDefinition term="openaire_cris_projects">
+        <Query>
+          <booleanQuery type="OR">
+            <booleanQuery type="OR" excludeOrRequire="require">
+              <textQuery field="docdir" type="matchKeyword">/joai/data/projects</textQuery>
+            </booleanQuery>
+          </booleanQuery>
         </Query>
       </virtualSearchTermDefinition>
     </virtualSearchField>
@@ -110,13 +125,13 @@
     <setSpec>openaire_cris_publications</setSpec>
     <setName>OpenAIRE_CRIS_publications</setName>
     <virtualSearchField field="setSpec">
-      <virtualSearchTermDefinition term="publications">
+      <virtualSearchTermDefinition term="openaire_cris_publications">
         <Query>
-          <booleanQuery type="OR">
-            <booleanQuery type="OR" excludeOrRequire="require">
+          <booleanQuery  type="OR">
+            <booleanQuery  type="OR" excludeOrRequire="require">
               <textQuery field="docdir" type="matchKeyword">/joai/data/publications</textQuery>
-            </booleanQuery>
-          </booleanQuery>
+            </booleanQuery >
+          </booleanQuery >
         </Query>
       </virtualSearchTermDefinition>
     </virtualSearchField>

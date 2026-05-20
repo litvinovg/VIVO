@@ -5,6 +5,9 @@ ENV VIVO_URL=${VIVO_URL}
 WORKDIR /tmp
 RUN apt-get update && apt-get install -y ant unzip git maven
 RUN git clone https://github.com/NCAR/joai-project
+COPY Identify.patch ./
+
+RUN patch joai-project/web/oai_requests/Identify.jsp Identify.patch
 
 WORKDIR /usr/local
 RUN curl --location 'https://dlcdn.apache.org/tomcat/tomcat-9/v9.0.118/bin/apache-tomcat-9.0.118.tar.gz' | tar xz
