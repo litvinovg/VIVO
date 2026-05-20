@@ -47,8 +47,8 @@
     </virtualSearchField>
   </set>
   <set>
-    <setSpec>openaire_cris_organizations</setSpec>
-    <setName>OpenAIRE_CRIS_organizations</setName>
+    <setSpec>openaire_cris_orgunits</setSpec>
+    <setName>OpenAIRE_CRIS_orgunits</setName>
     <virtualSearchField field="setSpec">
       <virtualSearchTermDefinition term="organizations">
         <Query>
