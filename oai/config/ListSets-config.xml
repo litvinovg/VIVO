@@ -3,7 +3,7 @@
 <ListSets>
   <set>
     <setSpec>openaire_cris_equipment</setSpec>
-    <setName>openaire_cris_equipment</setName>
+    <setName>OpenAIRE_CRIS_equipment</setName>
     <virtualSearchField field="setSpec">
       <virtualSearchTermDefinition term="equipment">
         <Query>
@@ -18,7 +18,7 @@
   </set>
   <set>
     <setSpec>openaire_cris_events</setSpec>
-    <setName>openaire_cris_events</setName>
+    <setName>OpenAIRE_CRIS_events</setName>
     <virtualSearchField field="setSpec">
       <virtualSearchTermDefinition term="events">
         <Query>
@@ -33,7 +33,7 @@
   </set>
   <set>
     <setSpec>openaire_cris_fundings</setSpec>
-    <setName>openaire_cris_fundings</setName>
+    <setName>OpenAIRE_CRIS_fundings</setName>
     <virtualSearchField field="setSpec">
       <virtualSearchTermDefinition term="fundings">
         <Query>
@@ -48,7 +48,7 @@
   </set>
   <set>
     <setSpec>openaire_cris_organizations</setSpec>
-    <setName>openaire_cris_organizations</setName>
+    <setName>OpenAIRE_CRIS_organizations</setName>
     <virtualSearchField field="setSpec">
       <virtualSearchTermDefinition term="organizations">
         <Query>
@@ -63,7 +63,7 @@
   </set>
   <set>
     <setSpec>openaire_cris_patents</setSpec>
-    <setName>openaire_cris_patents</setName>
+    <setName>OpenAIRE_CRIS_patents</setName>
     <virtualSearchField field="setSpec">
       <virtualSearchTermDefinition term="patents">
         <Query>
@@ -78,7 +78,7 @@
   </set>
   <set>
     <setSpec>openaire_cris_persons</setSpec>
-    <setName>openaire_cris_persons</setName>
+    <setName>OpenAIRE_CRIS_persons</setName>
     <virtualSearchField field="setSpec">
       <virtualSearchTermDefinition term="persons">
         <Query>
@@ -93,7 +93,7 @@
   </set>
   <set>
     <setSpec>openaire_cris_products</setSpec>
-    <setName>openaire_cris_products</setName>
+    <setName>OpenAIRE_CRIS_products</setName>
     <virtualSearchField field="setSpec">
       <virtualSearchTermDefinition term="products">
         <Query>
@@ -108,7 +108,7 @@
   </set>
   <set>
     <setSpec>openaire_cris_publications</setSpec>
-    <setName>openaire_cris_publications</setName>
+    <setName>OpenAIRE_CRIS_publications</setName>
     <virtualSearchField field="setSpec">
       <virtualSearchTermDefinition term="publications">
         <Query>
