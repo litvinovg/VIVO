@@ -61,10 +61,8 @@
         a                       <java:edu.cornell.library.scholars.webapp.controller.api.distribute.rdf.graphbuilder.ConstructQueryGraphBuilder> , <java:edu.cornell.library.scholars.webapp.controller.api.distribute.rdf.graphbuilder.GraphBuilder> ;
         vitro:mostSpecificType  <java:edu.cornell.library.scholars.webapp.controller.api.distribute.rdf.graphbuilder.ConstructQueryGraphBuilder> , <java:edu.cornell.library.scholars.webapp.controller.api.distribute.rdf.graphbuilder.GraphBuilder> ;
         :builderName            "OAI PMH Projects" ;
-        :constructQuery         "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\r\nPREFIX vivo: <http://vivoweb.org/ontology/core#>\r\nPREFIX vitro: <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#>\r\nCONSTRUCT {\r\n  ?project rdfs:comment \"OpenAIRE Projects\" .\r\n  ?project ?p ?o .\r\n}\r\nWHERE {\r\n  BIND (?uri as ?project)\r\n  ?project a vivo:Project .\r\n  ?project rdfs:label|vitro:mostSpecificType|a ?o .\r\n  ?project ?p ?o .\r\n}" ;
+        :constructQuery         "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\r\nPREFIX vivo: <http://vivoweb.org/ontology/core#>\r\nPREFIX vitro: <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#>\r\nPREFIX obo: <http://purl.obolibrary.org/obo/>\r\nPREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\r\nCONSTRUCT {\r\n  ?project rdfs:comment \"OpenAIRE Project\" .\r\n  ?project ?p ?o .\r\n  ?project obo:BFO_0000055 ?role .\r\n  ?role a ?roleType .\r\n  ?role obo:RO_0000052 ?agent .\r\n  ?agent rdfs:label ?agentLabel .\r\n  ?agent rdf:type ?agentType .\r\n}\r\nWHERE {\r\n  BIND (?uri as ?project)\r\n  ?project a vivo:Project .\r\n  ?project rdfs:label|vitro:mostSpecificType|a ?o .\r\n  ?project ?p ?o .\r\n  OPTIONAL {\r\n    ?project obo:BFO_0000055 ?role .\r\n    ?role a ?roleType .\r\n    ?role obo:RO_0000052 ?agent .\r\n    ?agent rdfs:label ?agentLabel .\r\n    ?agent rdf:type ?agentType .\r\n  }\r\n}" ;
         :uriBinding             "uri" .
-
-
 
 :7e49263f-bb4a-4394-8e13-f4a2b643ec56
         a                       <java:edu.cornell.library.scholars.webapp.controller.api.distribute.rdf.graphbuilder.ConstructQueryGraphBuilder> , <java:edu.cornell.library.scholars.webapp.controller.api.distribute.rdf.graphbuilder.GraphBuilder> ;
