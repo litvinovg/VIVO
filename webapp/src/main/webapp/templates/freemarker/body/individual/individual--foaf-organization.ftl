@@ -6,8 +6,8 @@
 
 <#if temporalVisualizationEnabled 
   || mapOfScienceVisualizationEnabled 
-  || isReportAuth("http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#f7e37336-93fe-41fb-acc4-ebcd8234e571")
-  || isReportAuth("http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#d0b1ec8b-f0c0-4a04-9832-5caf67a9e2a0") >
+  || isReportAuth("http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#OrganizationMetricsReport")
+  || isReportAuth("http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#OrganizationTrendsReport") >
     <#assign classSpecificExtension>
         <section id="right-hand-column" role="region">
             <#if temporalVisualizationEnabled>
@@ -16,10 +16,10 @@
             <#if mapOfScienceVisualizationEnabled>
                 <#include "individual-visualizationMapOfScience.ftl">
             </#if>
-            <#if isReportAuth("http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#f7e37336-93fe-41fb-acc4-ebcd8234e571") >
+            <#if isReportAuth("http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#OrganizationMetricsReport") >
                 <#include "individual-organizationMetricsReport.ftl">
             </#if>
-            <#if isReportAuth("http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#d0b1ec8b-f0c0-4a04-9832-5caf67a9e2a0") >
+            <#if isReportAuth("http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#OrganizationTrendsReport") >
                 <#include "individual-organizationTrendsReport.ftl">
             </#if>
         </section> <!-- #right-hand-column -->
