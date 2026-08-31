@@ -208,6 +208,7 @@ WHERE {
         }
       }
     }
+    OPTIONAL {
     BIND(COALESCE(?uri, <http://vivo.mydomain.edu/individual/n5513>) as ?organization)
     ?organization a foaf:Organization .
     ?organization obo:BFO_0000051*/vivo:relatedBy ?position1 .
@@ -247,6 +248,7 @@ WHERE {
     BIND(IF(NOT EXISTS {
           ?organization obo:BFO_0000051*/vivo:relatedBy  ?position2 
         }, 1/0, ?publication ) as ?publicationExt ) 
+    }
   }
 } GROUP BY ?year
 	""" ;
@@ -298,6 +300,7 @@ PREFIX vivo: <http://vivoweb.org/ontology/core#>
 	        BIND(STRDT(STR(?year) + '-01-01T00:00:00', xsd:dateTime) as ?targetYearStart)
 	      }
 	    }
+            OPTIONAL {
 	    BIND(COALESCE(?uri, <http://vivo.mydomain.edu/individual/n5513>) as ?organization)
 	    ?organization a foaf:Organization .
 	    ?organization obo:BFO_0000051*/vivo:relatedBy ?position1 .
@@ -339,6 +342,7 @@ PREFIX vivo: <http://vivoweb.org/ontology/core#>
 	    BIND(IF(EXISTS { ?organization obo:BFO_0000051*/vivo:relatedBy ?position2 }, 1/0, ?grant ) as ?grantInt ) 
 	    BIND(IF(NOT EXISTS { ?organization obo:BFO_0000051*/vivo:relatedBy ?position2 }, 1/0, ?grant ) as ?grantExt ) 
 	  }
+         }
 	} GROUP BY ?year
 	""" ;
         :uriBinding    "uri" ;
