@@ -736,9 +736,9 @@ WHERE {
 		  ?vcardURL vcard:url ?url .
 		  ?patent vivo:hasSubjectArea ?area .
 		  ?area ?areaP ?areaO .
-		  ?publication vivo:dateIssued ?dateIssued .
+		  ?patent vivo:dateIssued ?dateIssued .
 		  ?dateIssued ?dateIssuedP ?dateIssuedO .
-		  ?publication vivo:dateFiled ?dateFiled .
+		  ?patent vivo:dateFiled ?dateFiled .
 		  ?dateFiled ?dateFiledP ?dateFiledO .
 		} WHERE {
 		  BIND (?uri as ?patent)
@@ -763,11 +763,11 @@ WHERE {
 		    ?area ?areaP ?areaO .
 		  }
 		  OPTIONAL {
-		    ?publication vivo:dateIssued ?dateIssued .
+		    ?patent vivo:dateIssued ?dateIssued .
 		    ?dateIssued ?dateIssuedP ?dateIssuedO .
 		  }
 		  OPTIONAL {
-		    ?publication vivo:dateFiled ?dateFiled .
+		    ?patent vivo:dateFiled ?dateFiled .
 		    ?dateFiled ?dateFiledP ?dateFiledO .
 		  }
 		}
