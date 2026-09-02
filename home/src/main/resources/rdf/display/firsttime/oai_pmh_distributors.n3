@@ -142,6 +142,13 @@
 		  ?role obo:RO_0000052 ?agent .
 		  ?agent rdfs:label ?agentLabel .
 		  ?agent rdf:type ?agentType .
+		  ?project vivo:dateTimeInterval ?dti .
+		  ?dti vivo:end ?dtiEnd .
+		  ?dtiEnd vivo:dateTime ?dtiEndValue .
+		  ?dtiEnd vivo:dateTimePrecision ?dtiEndPrecision .
+		  ?dti vivo:start ?dtiStart .
+		  ?dtiStart vivo:dateTime ?dtiStartValue .
+		  ?dtiStart vivo:dateTimePrecision ?dtiStartPrecision .
 		}
 		WHERE {
 		  BIND (?uri as ?project)
@@ -154,6 +161,20 @@
 		    ?role obo:RO_0000052 ?agent .
 		    ?agent rdfs:label ?agentLabel .
 		    ?agent rdf:type ?agentType .
+		  }
+		  OPTIONAL {
+		    ?project vivo:dateTimeInterval ?dti .
+		    {
+		      ?dti vivo:end ?dtiEnd .
+		      ?dtiEnd vivo:dateTime ?dtiEndValue .
+		      ?dtiEnd vivo:dateTimePrecision ?dtiEndPrecision .
+		    } 
+		    UNION
+		    {
+		      ?dti vivo:start ?dtiStart .
+		      ?dtiStart vivo:dateTime ?dtiStartValue .
+		      ?dtiStart vivo:dateTimePrecision ?dtiStartPrecision .
+		    }
 		  }
 		}
         """ ;
