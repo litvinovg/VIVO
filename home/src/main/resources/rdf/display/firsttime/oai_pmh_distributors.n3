@@ -540,8 +540,7 @@ WHERE {
 		CONSTRUCT {
 		  ?uri rdfs:comment "OpenAIRE Funding" .
 		  ?funding ?p ?o .
-		  ?funding vivo:hasSubjectArea ?subjArea .
-		  ?subjArea vivo:hasAssociatedConcept ?concept .
+		  ?funding vivo:hasSubjectArea ?concept .
 		  ?concept rdfs:label ?conceptLabel .
 		  ?funding obo:BFO_0000050 ?ofFunding .
 		  ?ofFunding a ?ofFundingType .
@@ -586,8 +585,7 @@ WHERE {
 		    ?funder rdfs:label ?funderLabel .
 		  }
 		  OPTIONAL {
-		    ?funding vivo:hasSubjectArea ?subjArea .
-		    ?subjArea vivo:hasAssociatedConcept ?concept .
+		    ?funding vivo:hasSubjectArea ?concept .
 		    ?concept rdfs:label ?conceptLabel .
 		  }
 		  OPTIONAL {
