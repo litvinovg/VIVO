@@ -460,7 +460,9 @@ WHERE {
 		CONSTRUCT {
 		  ?org ?orgP ?orgO .
 		  ?uri rdfs:comment "OpenAIRE OrgUnit" .
+		  ?org vivo:rorId ?rorId .
 		  ?greaterOrg obo:BFO_0000050 ?org .
+		  ?greaterOrg vivo:rorId ?greaterOrgId .
 		  ?org obo:ARG_2000028 ?vcardInd .
 		  ?vcardInd vcard:hasURL ?urlInd .
 		  ?urlInd vcard:url ?url .
@@ -478,6 +480,12 @@ WHERE {
 		  ?uri a foaf:Organization .
 		  OPTIONAL {
 		    ?greaterOrg obo:BFO_0000050 ?org .
+		    OPTIONAL {
+		      ?greaterOrg vivo:rorId ?greaterOrgId .
+		    }
+		  }
+		  OPTIONAL {
+		    ?org vivo:rorId ?rorId .
 		  }
 		  ?org a|rdfs:label|vitro:mostSpecificType|vivo:abbreviation ?orgO .
 		  ?org ?orgP ?orgO .
