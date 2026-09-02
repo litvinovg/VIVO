@@ -228,6 +228,7 @@ WHERE {
 		  ?publication ?p ?o .
 		  ?publication vivo:relatedBy ?relBy .
 		  ?relBy a ?relType .
+		  ?relBy vivo:rank ?rank .
 		  ?relBy vivo:relates ?agent .
 		  ?agent a ?agentType .
 		  ?agent rdfs:label ?agentLabel .
@@ -256,6 +257,9 @@ WHERE {
 		  {
 		    ?publication vivo:relatedBy ?relBy .
 		    ?relBy a ?relType .
+		    OPTIONAL {
+		      ?relBy vivo:rank ?rank .
+		    }
 		    ?relBy vivo:relates ?agent .
 		    ?agent a ?agentType .
 		    ?agent rdfs:label ?agentLabel .
