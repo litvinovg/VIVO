@@ -69,9 +69,11 @@
 		    BIND ("type" as ?filterName)
 		    VALUES ?filterValue {
 		      bibo:AudioVisualDocument
+		      bibo:AudioDocument
 		      vivo:CaseStudy
 		      vivo:Dataset
 		      bibo:Image
+		      bibo:Webpage
 		    }
 		    BIND ("OAI PMH Product" as ?endpoint)
 		    BIND ("" as ?lang)
@@ -664,6 +666,14 @@ WHERE {
 		  UNION
 		  {
 		    ?product a bibo:Image .
+		  }
+		  UNION 
+		  {
+		    ?product a bibo:AudioDocument .
+		  }
+		  UNION 
+		  {
+		    ?product a bibo:Webpage .
 		  }
 		  ?product rdfs:label|vitro:mostSpecificType|a|bibo:doi|vivo:freetextKeyword|bibo:abstract ?o .
 		  ?product ?productP ?productO .
