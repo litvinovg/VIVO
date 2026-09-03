@@ -642,6 +642,7 @@ WHERE {
 		  ?event ?eventProp ?eventValue .
 		  ?product vivo:relatedBy ?relBy .
 		  ?relBy a ?relType .
+                  ?relBy vivo:rank ?rank .
 		  ?relBy vivo:relates ?agent .
 		  ?agent a ?agentType .
 		  ?agent rdfs:label ?agentLabel .
@@ -687,6 +688,9 @@ WHERE {
 		  }
 		  OPTIONAL {
 		    ?product vivo:relatedBy ?relBy .
+                    OPTIONAL {
+		      ?relBy vivo:rank ?rank .
+		    }
 		    ?relBy a ?relType .
 		    ?relBy vivo:relates ?agent .
 		    ?agent a ?agentType .
@@ -726,6 +730,7 @@ WHERE {
 		  ?patent ?p ?o .
 		  ?patent vivo:relatedBy ?relBy .
 		  ?relBy a ?relType .
+		  ?relBy vivo:rank ?rank .
 		  ?relBy vivo:relates ?agent .
 		  ?agent a ?agentType .
 		  ?agent rdfs:label ?agentLabel .
@@ -745,6 +750,9 @@ WHERE {
 		  ?patent ?p ?o .
 		  OPTIONAL {
 		    ?patent vivo:relatedBy ?relBy .
+                    OPTIONAL {
+		      ?relBy vivo:rank ?rank .
+		    }
 		    ?relBy a ?relType .
 		    ?relBy vivo:relates ?agent .
 		    ?agent a ?agentType .
