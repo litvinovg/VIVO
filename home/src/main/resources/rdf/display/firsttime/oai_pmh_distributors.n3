@@ -590,7 +590,7 @@ WHERE {
 		  }
 		  OPTIONAL {
 		    ?funding obo:BFO_0000050 ?ofFunding .
-		    ?ofFunding a bibo:Grant .
+		    ?ofFunding a vivo:Grant .
 		    ?ofFunding a ?ofFundingType .
 		    ?ofFunding vitro:mostSpecificType ?ofFundingMst .
 		    ?ofFunding rdfs:label ?ofFundingLabel .
