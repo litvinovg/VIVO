@@ -303,28 +303,28 @@ PREFIX vivo: <http://vivoweb.org/ontology/core#>
 	    BIND(COALESCE(?uri, <http://vivo.mydomain.edu/individual/n5513>) as ?organization)
 	    ?organization a foaf:Organization .
 	    ?organization obo:BFO_0000051*/vivo:relatedBy ?position1 .
-        ?position1 a vivo:Position .
-        ?position1 vivo:relates ?person1 .
+	    ?position1 a vivo:Position .
+	    ?position1 vivo:relates ?person1 .
 	    ?person1 a foaf:Person .
 	    ?person1 obo:RO_0000053/vivo:relatedBy ?grant .
 	    ?grant a vivo:Grant .
 	    ?person2 obo:RO_0000053/vivo:relatedBy ?grant .
 	    ?person2 a foaf:Person .
 	    FILTER(?person1 != ?person2)
-        ?position2 vivo:relates ?person2 .
-        ?position2 a vivo:Position .
+	    ?position2 vivo:relates ?person2 .
+	    ?position2 a vivo:Position .
 	    ?grant vivo:dateTimeInterval ?dti .
 	    ?dti vivo:start/vivo:dateTime ?startTime .
 	    ?dti vivo:end/vivo:dateTime ?endTime .
 	    FILTER (?startTime <= ?targetYearEnd)
 	    FILTER (?endTime >= ?targetYearStart)
    		OPTIONAL {
-          ?position1 vivo:dateTimeInterval ?dti1 .
-          ?dti1 vivo:start/vivo:dateTime ?position1StartDT .
-          OPTIONAL {
-            ?dti1 vivo:end/vivo:dateTime ?position1EndDT .
-          }
-        }
+	          ?position1 vivo:dateTimeInterval ?dti1 .
+	          ?dti1 vivo:start/vivo:dateTime ?position1StartDT .
+	          OPTIONAL {
+	            ?dti1 vivo:end/vivo:dateTime ?position1EndDT .
+	          }
+	        }
         FILTER(!BOUND(?position1StartDT) || ?position1StartDT <= ?endTime)
         FILTER(!BOUND(?position1EndDT) || ?position1EndDT >= ?startTime)
 
@@ -461,22 +461,25 @@ PREFIX vivo: <http://vivoweb.org/ontology/core#>
 		{
 			SELECT DISTINCT ?g1 ?g2 ?grant ?grantLabel
 			WHERE {
-			BIND(COALESCE(?uri, <http://vivo.mydomain.edu/individual/n5513>) as ?organization)
-			?organization a foaf:Organization .
-			?organization obo:BFO_0000051*/vivo:relatedBy/vivo:relates ?person .
-			?person a foaf:Person .
-			?person obo:RO_0000053/vivo:relatedBy ?grant .
-			{
-				?person obo:RO_0000053/vivo:relatedBy ?grant .
-				?grant a vivo:Grant .
-				?grant rdfs:label ?grantLabel .
-				BIND(?grant as ?g1)
-			}
-			UNION {
-				?person obo:RO_0000053/vivo:relatedBy ?grant .
-				?grant a vivo:Grant .
-				BIND(?grant as ?g2)
-			}
+				{
+					BIND(COALESCE(?uri, <http://vivo.mydomain.edu/individual/n5513>) as ?organization)
+					?organization a foaf:Organization .
+					?organization obo:BFO_0000051*/vivo:relatedBy/vivo:relates ?person .
+					?person a foaf:Person .
+					?person obo:RO_0000053/vivo:relatedBy ?grant .
+					?grant a vivo:Grant .
+					?grant rdfs:label ?grantLabel .
+					BIND(?grant as ?g1)
+				}
+				UNION {
+					BIND(COALESCE(?uri, <http://vivo.mydomain.edu/individual/n5513>) as ?organization)
+					?organization a foaf:Organization .
+					?organization obo:BFO_0000051*/vivo:relatedBy/vivo:relates ?person .
+					?person a foaf:Person .
+					?person obo:RO_0000053/vivo:relatedBy ?grant .
+					?grant a vivo:Grant .
+					BIND(?grant as ?g2)
+				}
 			} ORDER BY ?grant DESC(?g1)
 		}
 		OPTIONAL {
@@ -572,18 +575,21 @@ PREFIX vivo: <http://vivoweb.org/ontology/core#>
 	  {
 	    SELECT DISTINCT ?c1 ?c2 ?concept ?conceptLabel
 	    WHERE {
-	      BIND(COALESCE(?uri, <http://vivo.mydomain.edu/individual/n5513>) as ?organization)
-	      ?organization a foaf:Organization .
-	      ?organization obo:BFO_0000051*/vivo:relatedBy/vivo:relates ?person .
-	      ?person a foaf:Person .
-	      ?person vivo:hasResearchArea ?concept .
 	      {
+	        BIND(COALESCE(?uri, <http://vivo.mydomain.edu/individual/n5513>) as ?organization)
+	        ?organization a foaf:Organization .
+	        ?organization obo:BFO_0000051*/vivo:relatedBy/vivo:relates ?person .
+	        ?person a foaf:Person .
 	        ?person vivo:hasResearchArea ?concept .
 	        ?concept a skos:Concept .
 	        ?concept rdfs:label ?conceptLabel .
 	        BIND(?concept as ?c1)
 	      }
 	      UNION {
+	        BIND(COALESCE(?uri, <http://vivo.mydomain.edu/individual/n5513>) as ?organization)
+	        ?organization a foaf:Organization .
+	        ?organization obo:BFO_0000051*/vivo:relatedBy/vivo:relates ?person .
+	        ?person a foaf:Person .
 	        ?person vivo:hasResearchArea ?concept .
 	        ?concept a skos:Concept .
 	        BIND(?concept as ?c2)
@@ -620,18 +626,22 @@ PREFIX vivo: <http://vivoweb.org/ontology/core#>
 	  {
 	    SELECT DISTINCT ?p1 ?p2 ?patent ?patentLabel
 	    WHERE {
-	      BIND(COALESCE(?uri, <http://vivo.mydomain.edu/individual/n5513>) as ?organization)
-	      ?organization a foaf:Organization .
-	      ?organization obo:BFO_0000051*/vivo:relatedBy/vivo:relates ?person .
-	      ?person a foaf:Person .
 	      ?person vivo:relatedBy/vivo:relates ?patent .
 	      {
+	        BIND(COALESCE(?uri, <http://vivo.mydomain.edu/individual/n5513>) as ?organization)
+	        ?organization a foaf:Organization .
+	        ?organization obo:BFO_0000051*/vivo:relatedBy/vivo:relates ?person .
+	        ?person a foaf:Person .
 	        ?person vivo:relatedBy/vivo:relates ?patent .
 	        ?patent a bibo:Patent .
 	        ?patent rdfs:label ?patentLabel .
 	        BIND(?patent as ?p1)
 	      }
 	      UNION {
+	        BIND(COALESCE(?uri, <http://vivo.mydomain.edu/individual/n5513>) as ?organization)
+	        ?organization a foaf:Organization .
+	        ?organization obo:BFO_0000051*/vivo:relatedBy/vivo:relates ?person .
+	        ?person a foaf:Person .
 	        ?person vivo:relatedBy/vivo:relates ?patent .
 	        ?patent a bibo:Patent .
 	        BIND(?patent as ?p2)
